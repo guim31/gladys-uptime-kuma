@@ -111,7 +111,12 @@ const clean = (value) =>
   value === undefined || value === '' || value === 'null' || value === 'undefined' ? null : value;
 const cleanUrl = (value) => {
   const url = clean(value);
-  return url === null || /^https?:\/\/$/i.test(url) ? null : url;
+  if (url === null || /^https?:\/\/$/i.test(url)) {
+    return null;
+  }
+  // Credentials typed in a monitor URL never travel further (device
+  // parameters, scene variables).
+  return url.replace(/^([a-z][a-z0-9+.-]*:\/\/)[^/@\s]*@/i, '$1');
 };
 
 const hash = (text) => createHash('sha1').update(text).digest('hex').slice(0, 12);

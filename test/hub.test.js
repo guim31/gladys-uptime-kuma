@@ -479,3 +479,17 @@ test('Gladys restarted: everything is sent again', async (t) => {
   assert.equal(w.fake.states.length - sent, 7, 'every state again');
   assert.equal(w.fake.discoveredDevices.length, 3);
 });
+
+test('a slot left empty forgets its states; another Uptime Kuma there starts afresh', async (t) => {
+  const w = await world(t);
+  w.kuma.set(2, { status: 0 });
+  await step(w);
+  assert.ok(w.hub.saved.monitors['1:m2']);
+  await w.fake.configUpdated({ language: 'en' });
+  assert.deepEqual(w.hub.saved.monitors, {});
+
+  // Another instance in slot 1, whose monitor 2 is up: no "back up".
+  w.kuma.set(2, { status: 1 });
+  await w.fake.configUpdated({ instance_1_url: URL_1, instance_1_api_key: API_KEY });
+  assert.equal(events(w, TRIGGERS.UP).length, 0);
+});

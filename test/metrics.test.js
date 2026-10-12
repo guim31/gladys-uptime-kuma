@@ -184,3 +184,12 @@ test('an unknown status value is no status', () => {
   const kuma = new FakeKuma({ monitors: [monitor({ id: 1, status: 7 })] });
   assert.equal(parseMetrics(kuma.render()).monitors[0].status, null);
 });
+
+test('credentials typed in a monitor URL are dropped', () => {
+  const kuma = new FakeKuma({
+    monitors: [monitor({ id: 1, url: 'https://admin:s3cret@nas.example.com:5001/?q=1' })],
+  });
+  const [read] = parseMetrics(kuma.render()).monitors;
+  assert.equal(read.url, 'https://nas.example.com:5001/?q=1');
+  assert.equal(read.target, 'https://nas.example.com:5001/?q=1');
+});

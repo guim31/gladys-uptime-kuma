@@ -155,6 +155,7 @@ export class KumaHub {
         this.records.delete(slot);
       }
     }
+    this.forgetSlots(new Set(wanted.keys()));
     for (const instance of config.instances) {
       const record = this.records.get(instance.slot);
       if (record) {
@@ -495,6 +496,26 @@ export class KumaHub {
       } else if (!soon && this.saved.certificates[id]) {
         delete this.saved.certificates[id];
       }
+    }
+  }
+
+  /**
+   * Forget what was kept of the slots left empty: another Uptime Kuma typed
+   * there later must not inherit their states (an address changed in a slot
+   * keeps them: it is usually the same Uptime Kuma).
+   */
+  forgetSlots(kept) {
+    let changed = false;
+    for (const table of Object.values(this.saved)) {
+      for (const id of Object.keys(table)) {
+        if (!kept.has(Number(id.split(':')[0]))) {
+          delete table[id];
+          changed = true;
+        }
+      }
+    }
+    if (changed) {
+      this.store.save(this.saved);
     }
   }
 
