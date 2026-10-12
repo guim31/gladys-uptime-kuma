@@ -160,3 +160,27 @@ test('Refresh reads Uptime Kuma again', async (t) => {
   const unknown = await w.fake.widgetAction(WIDGET_KEY, 'nope', {}, { settings: {} });
   assert.equal(unknown.success, false);
 });
+
+test('two instances: each row names its instance, monitor names may repeat', async (t) => {
+  const outside = new FakeKuma({
+    apiKey: 'uk2_outside',
+    monitors: [monitor({ id: 1, name: 'Nextcloud', status: 0 })],
+  });
+  const w = await world(t, {
+    instances: { [URL_1]: new FakeKuma(), 'https://198.51.100.20': outside },
+    config: {
+      instance_1_url: URL_1,
+      instance_1_api_key: API_KEY,
+      instance_1_name: 'Home',
+      instance_2_url: 'https://198.51.100.20',
+      instance_2_api_key: 'uk2_outside',
+      instance_2_name: 'Outside',
+    },
+  });
+  assert.deepEqual(rows(await content(w)).slice(0, 2), [
+    ['Nextcloud (Outside)', 'Down', 'danger'],
+    ['Jellyfin (Home)', '4 ms', 'success'],
+  ]);
+  const ack = await w.fake.sceneAction('count_down_services', {});
+  assert.equal(ack.data.outputs.names, 'Nextcloud (Outside)');
+});

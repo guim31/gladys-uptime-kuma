@@ -90,7 +90,7 @@ export function selectRows(hub, settings) {
     return hub.counted().map(({ record, monitor }) => ({
       record,
       monitor,
-      name: monitor.name,
+      name: hub.displayName(record, monitor.name),
       state: record.error ? 'unreachable' : statusKey(monitor),
     }));
   }
@@ -104,7 +104,7 @@ export function selectRows(hub, settings) {
     rows.push({
       record: found.record,
       monitor: found.monitor,
-      name: found.monitor?.name ?? device?.name ?? '?',
+      name: hub.displayName(found.record, found.monitor?.name ?? device?.name ?? '?'),
       state: found.record.error ? 'unreachable' : statusKey(found.monitor),
     });
   }

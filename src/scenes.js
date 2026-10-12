@@ -24,7 +24,8 @@ export const SCENE_ACTIONS = {
       throw new Error(pick(ACTION_TEXT.unknownMonitor, language));
     }
     await hub.refreshIfStale();
-    const { record, monitor } = hub.find(fields.device);
+    // Read again: the instance may have been reconfigured meanwhile.
+    const { record, monitor } = hub.find(fields.device) ?? found;
     if (record.error) {
       throw new Error(
         labelled(hub.instanceName(record), pick(ERROR_TEXT[record.error.kind], language), language),
@@ -53,13 +54,11 @@ export const SCENE_ACTIONS = {
     if (readable.length === 0) {
       throw new Error(pick(ACTION_TEXT.unreachable, hub.config.language));
     }
-    const monitors = hub
-      .counted()
-      .filter(({ record }) => !record.error)
-      .map(({ monitor }) => monitor);
-    const down = monitors
-      .filter((monitor) => monitor.status === STATUS.DOWN)
-      .map((monitor) => monitor.name)
+    const entries = hub.counted().filter(({ record }) => !record.error);
+    const monitors = entries.map(({ monitor }) => monitor);
+    const down = entries
+      .filter(({ monitor }) => monitor.status === STATUS.DOWN)
+      .map(({ record, monitor }) => hub.displayName(record, monitor.name))
       .sort((a, b) => a.localeCompare(b));
     const listed = down.slice(0, MAX_LISTED_NAMES);
     return {

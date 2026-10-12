@@ -231,6 +231,32 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
 - Écrire (pause, reprise) passe par l'API Socket.IO de l'interface, avec identifiant, mot de passe
   et 2FA de l'administrateur : **écarté**, l'intégration est en lecture seule.
 
+## Vérifié sur un vrai Uptime Kuma
+
+Le 12/10/2026, image Docker de l'intégration lancée avec les contraintes du bac à sable de Gladys
+(`--cap-drop ALL --security-opt no-new-privileges --read-only --memory 256m --pids-limit 256`,
+volume `/data`, réseau en pont) contre `louislam/uptime-kuma:1` (1.23.17) et `:2` (2.5.6), avec
+six sondes chacun : HTTP, HTTPS auto-signé (certificat de 10 jours, « ignorer TLS »), port TCP
+ouvert, port fermé, mot-clé (nom avec guillemets), groupe vide ; étiquette sur une sonde en 2.x.
+
+- **Sans Gladys** : reconnexion du SDK en backoff, pas de plantage, aucun secret dans les logs,
+  ~19 Mo au repos, arrêt propre sur SIGTERM (code 0).
+- **Client réel** : bonne clé (1.x et 2.x), mauvaise clé et clé de l'autre instance (`auth`),
+  pas de clé (`key_missing`), hôte inconnu, port fermé (`unreachable`), autre service HTTP
+  (`not_kuma`), HTTPS auto-signé refusé (`tls`) puis accepté avec l'option.
+- **Intégration complète** (faux Gladys du SDK, deux instances, noms en français) : découverte des
+  12 sondes, états, badge de transport, connexion, widget validé (`validateWidgetContent`),
+  actions de scène, « Tester la connexion », « Certificat bientôt expiré » au premier passage (9
+  et 10 jours). Serveur web de test **arrêté entre deux processus** : 8 « Un service tombe » à la
+  relecture (état gardé dans `/data`) ; **relancé** : 8 « Un service revient » avec la durée ; une
+  sonde **mise en pause** disparaît sans événement.
+- **Mise à jour réelle 1.23.17 → 2.5.6 sur les mêmes données** : la migration garde les ids, les
+  noms et la clé d'API ; les 6 appareils créés sous 1.x gardent leur identité (alias), aucun
+  événement parasite.
+- Non vérifié : une vraie instance Gladys (rendu du widget, éditeur de scènes, variables dans un
+  message), la maintenance d'Uptime Kuma (statut 3, couvert par les tests seulement), un proxy
+  inverse avec sous-chemin, MariaDB, la limite de 60 requêtes par minute atteinte pour de vrai.
+
 ## Store
 
 - Validateur officiel, depuis la racine : `npx -y github:GladysAssistant/integration-store .`

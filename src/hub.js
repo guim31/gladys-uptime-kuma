@@ -360,6 +360,11 @@ export class KumaHub {
     return record.instance.name ?? hostOf(record.instance.url);
   }
 
+  /** A monitor in a list: with its instance when two are configured (names may repeat). */
+  displayName(record, name) {
+    return this.records.size > 1 ? `${name} (${this.instanceName(record)})` : name;
+  }
+
   async applySuccess(record, { version, monitors }) {
     if (record.dropped) {
       return false;
