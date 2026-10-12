@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-10-12
+
 ### Added
 
 - One Gladys device per Uptime Kuma monitor, proposed in the Discover tab:
@@ -36,4 +38,5 @@ the notes of the version's GitHub Release.
 - Interface texts and documentation in English, French, German and Spanish.
 - Apache-2.0 `LICENSE` file.
 
-[Unreleased]: https://github.com/guim31/gladys-uptime-kuma/commits/main
+[Unreleased]: https://github.com/guim31/gladys-uptime-kuma/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/guim31/gladys-uptime-kuma/releases/tag/v1.0.0
