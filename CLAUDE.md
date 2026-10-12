@@ -16,8 +16,8 @@ its only runtime dependency. It started from the official JavaScript template.
 ```bash
 npm install
 npm test                                  # node --test, the built-in runner
-node --test test/devices.test.js          # one file
-node --test --test-name-pattern "plug"    # tests whose name matches
+node --test test/hub.test.js              # one file
+node --test --test-name-pattern "down"    # tests whose name matches
 npm run lint                              # ESLint
 npm run format:check                      # Prettier, as the CI runs it
 npm run format                            # Prettier, fix in place
@@ -31,16 +31,22 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
+index.js                          SDK wiring only: src/app.js registers the handlers before connect()
+src/app.js                        every SDK handler -> the hub (also used by the tests)
+src/hub.js                        instances, reading timer, states, transitions -> scene events, views
+src/devices.js                    one device per monitor: identity, features, names (4 languages), values
+src/kuma/client.js                GET /metrics with the API key, errors by kind
+src/kuma/metrics.js               Prometheus text parser, monitors of Uptime Kuma 1.x and 2.x
+src/kuma/http.js                  node:http/https request (self-signed certificates on request)
 src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+src/widgets.js                    dashboard widget `uptime_kuma` (manifest `widgets`)
+src/texts.js                      connection, error, state, report and action texts (4 languages)
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
+src/store.js                      /data/uptime-kuma-state.json (last states, certificates, 1.x aliases)
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
-docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
+docs/{en,fr,de,es}.md             user documentation, re-hosted by Gladys (en and fr mandatory)
 test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+                                  and helpers/fakeKuma.js (checked against test/fixtures/kuma)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -70,8 +76,10 @@ test/                             node --test, against the SDK's fake Gladys (in
   `type: "provider"`: 5.1.0). `test/manifest.test.js` ties the manifest to the
   code (defaults, action, scene and widget handlers): change both sides
   together.
-- **User-facing text** is bilingual (English and French): action messages,
-  manifest texts, and `docs/en.md` / `docs/fr.md`, kept in sync.
+- **User-facing text** exists in English, French, German and Spanish: action
+  messages, widget content, feature names, scene outputs, manifest texts, and
+  `docs/en.md`, `docs/fr.md`, `docs/de.md`, `docs/es.md`, kept in sync
+  (`test/i18n.test.js` checks the languages and the doc sections).
 - **Style.** Prettier formats, ESLint catches mistakes. Comments explain why,
   in English. Tests never touch the network.
 
@@ -177,6 +185,51 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
 - Les filtres de scène ne font qu'égalité et appartenance : un seuil reste le travail d'un capteur.
 - **Les clés de widgets, de déclencheurs et d'actions sont figées une fois publiées.**
 - `gladys_version` `>=5.1.0` dès qu'il y a widgets, déclencheurs ou actions de scène.
+
+**Store et formulaires**
+
+- Un champ `secret` du `config_schema` **ne peut pas avoir de `default`** : le validateur du store
+  rejette le manifeste (« not allowed for secret fields »).
+- Un champ à `source: "devices"` **ne peut pas avoir de `default`** non plus (schéma du cœur dès
+  la 5.1.0). `multi_select` + `source: "devices"` est accepté dès la 5.1.0 dans les réglages de
+  widget et les filtres de déclencheur (vérifié dans `manifest.schema.json` de `v5.1.0`).
+
+## Uptime Kuma (propre à ce dépôt)
+
+- **API lue : `GET /metrics`** (Prometheus), seule API de lecture stable et documentée, celle de
+  Home Assistant (`pythonkuma`). Authentification `apiAuth` de `server/auth.js` : Basic, utilisateur
+  vide, **clé d'API** en mot de passe (`uk<id>_<clé>`). Dès qu'une clé existe
+  (`apiKeysEnabled`), le mot de passe de l'utilisateur ne suffit plus ; « Désactiver
+  l'authentification » ouvre `/metrics` sans rien.
+- **Limite de 60 requêtes d'API par minute**, partagée par tous les clients (`apiRateLimiter`) ;
+  au-delà, la réponse est un **401 identique à une mauvaise clé**. Le texte d'erreur le dit.
+- Séries par moniteur (`server/prometheus.js`, identique en 2.5.X et sur `master` 3.0.0-beta) :
+  `monitor_status` (0 hors service, 1 en service, 2 en attente, 3 maintenance),
+  `monitor_response_time` (ms, **-1** quand le test n'a rien mesuré), `monitor_cert_days_remaining`
+  et `monitor_cert_is_valid` (sondes HTTPS seulement, **même avec « ignorer les erreurs TLS »**),
+  et en 2.x `monitor_uptime_ratio` / `monitor_response_time_seconds` par `window` (1d, 30d, 365d).
+  Libellés : `monitor_name`, `monitor_type`, `monitor_url`, `monitor_hostname`, `monitor_port`,
+  **chaîne `"null"`** pour un champ vide, et **`"https://"`** (valeur par défaut du formulaire) comme
+  URL d'une sonde non HTTP. `app_version{version,major,minor,patch}` donne la version.
+- **1.x n'a pas de `monitor_id`** : identité = hachage du nom (deux sondes homonymes départagées
+  par type et cible). **2.x** ajoute `monitor_id` et **un libellé par étiquette** (connue au
+  démarrage d'Uptime Kuma seulement : une étiquette créée ensuite n'apparaît qu'après un
+  redémarrage), d'où des séries d'une même sonde avec des jeux de libellés différents : regrouper
+  par `monitor_id`. Un appareil créé sous 1.x garde son identité en 2.x (alias dans `/data`, posé
+  quand l'appareil 1.x existe dans Gladys et pas celui de l'id).
+- Une sonde **en pause n'a aucune série** (`stop()` appelle `prometheus.remove()`) ; une
+  modification la retire puis la remet. Absente ≠ hors service : aucun événement.
+- Uptime Kuma 2 **sans base configurée** répond une page HTML en 200 sur toute adresse, `/metrics`
+  compris : traité comme « aucun Uptime Kuma à cette adresse ».
+- Les **transitions** se calculent sur l'état « posé » (en service, hors service, maintenance) :
+  « en attente » (nouvelle tentative) ne change rien. Premier passage : on enregistre sans
+  annoncer. États et certificats annoncés gardés dans `/data/uptime-kuma-state.json`.
+- Le **temps de réponse change à chaque test** : publié au plus une fois par minute et par sonde,
+  et seulement pour les appareils ajoutés, pour tenir sous les 300 états par minute.
+- Interface française d'Uptime Kuma : « Sondes », « Paramètres → Clés API », « En pause » ; les
+  textes français de l'intégration disent « sonde ».
+- Écrire (pause, reprise) passe par l'API Socket.IO de l'interface, avec identifiant, mot de passe
+  et 2FA de l'administrateur : **écarté**, l'intégration est en lecture seule.
 
 ## Store
 

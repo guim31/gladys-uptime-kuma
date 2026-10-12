@@ -1,177 +1,862 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "Uptime Kuma",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "See your self-hosted services in Gladys, and react when one goes down.",
+    "fr": "Vos services auto-hébergés dans Gladys, et des scènes quand l'un d'eux tombe.",
+    "de": "Sieh deine selbst gehosteten Dienste in Gladys und reagiere, wenn einer ausfällt.",
+    "es": "Vea sus servicios autoalojados en Gladys y reaccione cuando uno se caiga."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-uptime-kuma:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-uptime-kuma/main/cover.png",
+  "categories": ["network"],
+  "transports": ["local"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
+      "label": {
+        "en": "Your Uptime Kuma",
+        "fr": "Votre Uptime Kuma",
+        "de": "Dein Uptime Kuma",
+        "es": "Su Uptime Kuma"
+      },
       "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+        "en": "In Uptime Kuma, open Settings → API Keys, create a key and paste it below with the address of Uptime Kuma. Then add the monitors to follow from the Discover tab: the scene triggers work for every monitor, added or not.",
+        "fr": "Dans Uptime Kuma, ouvrez Paramètres → Clés API, créez une clé et collez-la ci-dessous avec l'adresse d'Uptime Kuma. Ajoutez ensuite les sondes à suivre depuis l'onglet Découverte : les déclencheurs de scène valent pour toutes les sondes, ajoutées ou non.",
+        "de": "Öffne in Uptime Kuma Einstellungen → API-Schlüssel, erstelle einen Schlüssel und füge ihn unten mit der Adresse von Uptime Kuma ein. Lege dann die Monitore, denen du folgen willst, im Tab „Entdecken“ an: Die Szenen-Auslöser gelten für alle Monitore, angelegt oder nicht.",
+        "es": "En Uptime Kuma, abra Ajustes → Claves API, cree una clave y péguela abajo con la dirección de Uptime Kuma. Después, añada los monitores que quiera seguir desde la pestaña Descubrir: los disparadores de escena valen para todos los monitores, añadidos o no."
       },
       "links": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "url": "https://github.com/guim31/gladys-uptime-kuma/blob/main/docs/en.md",
+          "label": {
+            "en": "Setup guide",
+            "fr": "Guide d'installation",
+            "de": "Installationsanleitung",
+            "es": "Guía de instalación"
+          }
+        },
+        {
+          "url": "https://github.com/louislam/uptime-kuma/wiki/API-Keys",
+          "label": {
+            "en": "Uptime Kuma API keys",
+            "fr": "Clés d'API d'Uptime Kuma",
+            "de": "API-Schlüssel von Uptime Kuma",
+            "es": "Claves API de Uptime Kuma"
+          }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "instance_1_url",
+      "type": "string",
+      "label": {
+        "en": "Uptime Kuma address",
+        "fr": "Adresse d'Uptime Kuma",
+        "de": "Adresse von Uptime Kuma",
+        "es": "Dirección de Uptime Kuma"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
+      "description": {
+        "en": "The address you open Uptime Kuma with, port included (3001 by default).",
+        "fr": "L'adresse avec laquelle vous ouvrez Uptime Kuma, port compris (3001 par défaut).",
+        "de": "Die Adresse, mit der du Uptime Kuma öffnest, mit Port (standardmäßig 3001).",
+        "es": "La dirección con la que abre Uptime Kuma, puerto incluido (3001 por defecto)."
+      },
+      "placeholder": {
+        "en": "e.g. http://192.168.1.2:3001",
+        "fr": "ex. http://192.168.1.2:3001",
+        "de": "z. B. http://192.168.1.2:3001",
+        "es": "p. ej. http://192.168.1.2:3001"
+      },
+      "required": false
     },
     {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
+      "key": "instance_1_api_key",
+      "type": "secret",
+      "label": {
+        "en": "API key",
+        "fr": "Clé d'API",
+        "de": "API-Schlüssel",
+        "es": "Clave API"
       },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
+      "description": {
+        "en": "Starts with \"uk\". Leave empty only if the authentication of Uptime Kuma is disabled.",
+        "fr": "Commence par « uk ». À laisser vide seulement si l'authentification d'Uptime Kuma est désactivée.",
+        "de": "Beginnt mit „uk“. Lass das Feld nur leer, wenn die Authentifizierung von Uptime Kuma deaktiviert ist.",
+        "es": "Empieza por «uk». Déjela vacía solo si la autenticación de Uptime Kuma está desactivada."
+      },
+      "required": false
     },
     {
-      "key": "unit",
+      "key": "instance_1_name",
+      "type": "string",
+      "label": {
+        "en": "Name (optional)",
+        "fr": "Nom (facultatif)",
+        "de": "Name (optional)",
+        "es": "Nombre (opcional)"
+      },
+      "description": {
+        "en": "Shown in the messages and the widget instead of the address.",
+        "fr": "Affiché dans les messages et le widget à la place de l'adresse.",
+        "de": "Wird in den Meldungen und im Widget statt der Adresse angezeigt.",
+        "es": "Se muestra en los mensajes y en el widget en lugar de la dirección."
+      },
+      "placeholder": {
+        "en": "e.g. Home",
+        "fr": "ex. Maison",
+        "de": "z. B. Zuhause",
+        "es": "p. ej. Casa"
+      },
+      "required": false
+    },
+    {
+      "key": "second_instance",
+      "type": "section",
+      "label": {
+        "en": "Second Uptime Kuma (optional)",
+        "fr": "Second Uptime Kuma (facultatif)",
+        "de": "Zweites Uptime Kuma (optional)",
+        "es": "Segundo Uptime Kuma (opcional)"
+      },
+      "description": {
+        "en": "For example an instance on a rented server, watching your home from the outside.",
+        "fr": "Par exemple une instance sur un serveur loué, qui surveille la maison depuis l'extérieur.",
+        "de": "Zum Beispiel eine Instanz auf einem gemieteten Server, die dein Zuhause von außen überwacht.",
+        "es": "Por ejemplo, una instancia en un servidor alquilado que vigila su casa desde fuera."
+      }
+    },
+    {
+      "key": "instance_2_url",
+      "type": "string",
+      "label": {
+        "en": "Second Uptime Kuma address",
+        "fr": "Adresse du second Uptime Kuma",
+        "de": "Adresse des zweiten Uptime Kuma",
+        "es": "Dirección del segundo Uptime Kuma"
+      },
+      "placeholder": {
+        "en": "e.g. https://status.example.com",
+        "fr": "ex. https://status.example.com",
+        "de": "z. B. https://status.example.com",
+        "es": "p. ej. https://status.example.com"
+      },
+      "required": false
+    },
+    {
+      "key": "instance_2_api_key",
+      "type": "secret",
+      "label": {
+        "en": "Second API key",
+        "fr": "Seconde clé d'API",
+        "de": "Zweiter API-Schlüssel",
+        "es": "Segunda clave API"
+      },
+      "required": false
+    },
+    {
+      "key": "instance_2_name",
+      "type": "string",
+      "label": {
+        "en": "Second name (optional)",
+        "fr": "Second nom (facultatif)",
+        "de": "Zweiter Name (optional)",
+        "es": "Segundo nombre (opcional)"
+      },
+      "placeholder": {
+        "en": "e.g. Outside",
+        "fr": "ex. Extérieur",
+        "de": "z. B. Außen",
+        "es": "p. ej. Exterior"
+      },
+      "required": false
+    },
+    {
+      "key": "options",
+      "type": "section",
+      "label": {
+        "en": "Options",
+        "fr": "Options",
+        "de": "Optionen",
+        "es": "Opciones"
+      },
+      "description": {
+        "en": "Uptime Kuma answers at most 60 API requests per minute, shared by every tool that reads its metrics.",
+        "fr": "Uptime Kuma répond à 60 requêtes d'API par minute au plus, partagées entre tous les outils qui lisent ses métriques.",
+        "de": "Uptime Kuma beantwortet höchstens 60 API-Anfragen pro Minute, geteilt mit allen Werkzeugen, die seine Metriken lesen.",
+        "es": "Uptime Kuma responde como máximo a 60 peticiones de API por minuto, compartidas entre todas las herramientas que leen sus métricas."
+      }
+    },
+    {
+      "key": "poll_interval",
       "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
+      "label": {
+        "en": "Refresh interval",
+        "fr": "Intervalle de rafraîchissement",
+        "de": "Aktualisierungsintervall",
+        "es": "Intervalo de actualización"
+      },
+      "description": {
+        "en": "How often Uptime Kuma is read. A shorter outage may go unseen.",
+        "fr": "Fréquence de lecture d'Uptime Kuma. Une panne plus courte peut passer inaperçue.",
+        "de": "Wie oft Uptime Kuma gelesen wird. Ein kürzerer Ausfall kann unbemerkt bleiben.",
+        "es": "Con qué frecuencia se lee Uptime Kuma. Una caída más corta puede pasar desapercibida."
+      },
       "required": false,
-      "default": "celsius",
+      "default": "30",
       "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
+        {
+          "value": "15",
+          "label": {
+            "en": "15 seconds",
+            "fr": "15 secondes",
+            "de": "15 Sekunden",
+            "es": "15 segundos"
+          }
+        },
+        {
+          "value": "30",
+          "label": {
+            "en": "30 seconds",
+            "fr": "30 secondes",
+            "de": "30 Sekunden",
+            "es": "30 segundos"
+          }
+        },
+        {
+          "value": "60",
+          "label": {
+            "en": "1 minute",
+            "fr": "1 minute",
+            "de": "1 Minute",
+            "es": "1 minuto"
+          }
+        },
+        {
+          "value": "120",
+          "label": {
+            "en": "2 minutes",
+            "fr": "2 minutes",
+            "de": "2 Minuten",
+            "es": "2 minutos"
+          }
+        },
+        {
+          "value": "300",
+          "label": {
+            "en": "5 minutes",
+            "fr": "5 minutes",
+            "de": "5 Minuten",
+            "es": "5 minutos"
+          }
+        }
       ]
     },
     {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "key": "cert_warning_days",
+      "type": "select",
+      "label": {
+        "en": "Certificate warning",
+        "fr": "Alerte de certificat",
+        "de": "Zertifikatswarnung",
+        "es": "Aviso de certificado"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "Days left at which \"Certificate expires soon\" fires, once per certificate.",
+        "fr": "Jours restants à partir desquels « Certificat bientôt expiré » se déclenche, une fois par certificat.",
+        "de": "Verbleibende Tage, ab denen „Zertifikat läuft bald ab“ auslöst, einmal pro Zertifikat.",
+        "es": "Días restantes a partir de los cuales se activa «El certificado caduca pronto», una vez por certificado."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": "14",
+      "options": [
+        {
+          "value": "7",
+          "label": {
+            "en": "7 days",
+            "fr": "7 jours",
+            "de": "7 Tage",
+            "es": "7 días"
+          }
+        },
+        {
+          "value": "14",
+          "label": {
+            "en": "14 days",
+            "fr": "14 jours",
+            "de": "14 Tage",
+            "es": "14 días"
+          }
+        },
+        {
+          "value": "21",
+          "label": {
+            "en": "21 days",
+            "fr": "21 jours",
+            "de": "21 Tage",
+            "es": "21 días"
+          }
+        },
+        {
+          "value": "30",
+          "label": {
+            "en": "30 days",
+            "fr": "30 jours",
+            "de": "30 Tage",
+            "es": "30 días"
+          }
+        }
+      ]
+    },
+    {
+      "key": "allow_self_signed",
+      "type": "boolean",
+      "label": {
+        "en": "Accept self-signed certificates",
+        "fr": "Accepter les certificats auto-signés",
+        "de": "Selbstsignierte Zertifikate akzeptieren",
+        "es": "Aceptar certificados autofirmados"
+      },
+      "description": {
+        "en": "Only for an https:// address whose certificate your browser does not trust either.",
+        "fr": "Seulement pour une adresse en https:// dont le certificat n'est pas reconnu par votre navigateur non plus.",
+        "de": "Nur für eine https://-Adresse, deren Zertifikat auch dein Browser nicht anerkennt.",
+        "es": "Solo para una dirección https:// cuyo certificado tampoco reconoce su navegador."
+      },
+      "required": false,
+      "default": false
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the names",
+        "fr": "Langue des noms",
+        "de": "Sprache der Namen",
+        "es": "Idioma de los nombres"
+      },
+      "description": {
+        "en": "Language of the feature names (set when a device is added) and of the scene results.",
+        "fr": "Langue des noms des fonctionnalités (fixés à l'ajout d'un appareil) et des résultats de scène.",
+        "de": "Sprache der Funktionsnamen (beim Hinzufügen eines Geräts festgelegt) und der Szenen-Ergebnisse.",
+        "es": "Idioma de los nombres de las funciones (fijados al añadir un dispositivo) y de los resultados de escena."
+      },
+      "required": false,
+      "default": "fr",
+      "options": [
+        {
+          "value": "en",
+          "label": {
+            "en": "English",
+            "fr": "Anglais",
+            "de": "Englisch",
+            "es": "Inglés"
+          }
+        },
+        {
+          "value": "fr",
+          "label": {
+            "en": "French",
+            "fr": "Français",
+            "de": "Französisch",
+            "es": "Francés"
+          }
+        },
+        {
+          "value": "de",
+          "label": {
+            "en": "German",
+            "fr": "Allemand",
+            "de": "Deutsch",
+            "es": "Alemán"
+          }
+        },
+        {
+          "value": "es",
+          "label": {
+            "en": "Spanish",
+            "fr": "Espagnol",
+            "de": "Spanisch",
+            "es": "Español"
+          }
+        }
+      ]
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
       "timeout_seconds": 30
-    },
-    {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ]
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
+      "key": "service_down",
+      "label": {
+        "en": "A service goes down",
+        "fr": "Un service tombe",
+        "de": "Ein Dienst fällt aus",
+        "es": "Un servicio se cae"
+      },
       "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+        "en": "An Uptime Kuma monitor goes down (from up or maintenance), retries spent.",
+        "fr": "Une sonde Uptime Kuma passe hors service (depuis en service ou maintenance), nouvelles tentatives épuisées.",
+        "de": "Ein Uptime-Kuma-Monitor fällt aus (aus „In Betrieb“ oder „Wartung“), nach allen Wiederholungen.",
+        "es": "Un monitor de Uptime Kuma se cae (desde en servicio o mantenimiento), agotados los reintentos."
       },
       "fields": [
         {
           "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
-        },
-        {
-          "key": "target",
           "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
-          "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
-          ]
+          "source": "devices",
+          "label": {
+            "en": "Monitors (empty: any)",
+            "fr": "Sondes (vide : n'importe laquelle)",
+            "de": "Monitore (leer: beliebig)",
+            "es": "Monitores (vacío: cualquiera)"
+          }
         }
       ],
       "variables": [
         {
-          "key": "target",
+          "key": "monitor",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "label": {
+            "en": "Monitor name",
+            "fr": "Nom de la sonde",
+            "de": "Name des Monitors",
+            "es": "Nombre del monitor"
+          }
+        },
+        {
+          "key": "type",
+          "type": "string",
+          "label": {
+            "en": "Monitor type",
+            "fr": "Type de sonde",
+            "de": "Monitortyp",
+            "es": "Tipo de monitor"
+          }
+        },
+        {
+          "key": "url",
+          "type": "string",
+          "label": {
+            "en": "URL or host",
+            "fr": "URL ou hôte",
+            "de": "URL oder Host",
+            "es": "URL o host"
+          }
+        },
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Uptime Kuma name",
+            "fr": "Nom de l'Uptime Kuma",
+            "de": "Name des Uptime Kuma",
+            "es": "Nombre del Uptime Kuma"
+          }
+        }
+      ]
+    },
+    {
+      "key": "service_up",
+      "label": {
+        "en": "A service is back up",
+        "fr": "Un service revient",
+        "de": "Ein Dienst ist wieder da",
+        "es": "Un servicio vuelve"
+      },
+      "description": {
+        "en": "An Uptime Kuma monitor that was down is up again, with the length of the outage.",
+        "fr": "Une sonde Uptime Kuma hors service est de nouveau en service, avec la durée de la panne.",
+        "de": "Ein ausgefallener Uptime-Kuma-Monitor ist wieder in Betrieb, mit der Dauer des Ausfalls.",
+        "es": "Un monitor de Uptime Kuma caído vuelve a estar en servicio, con la duración de la caída."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "multi_select",
+          "source": "devices",
+          "label": {
+            "en": "Monitors (empty: any)",
+            "fr": "Sondes (vide : n'importe laquelle)",
+            "de": "Monitore (leer: beliebig)",
+            "es": "Monitores (vacío: cualquiera)"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "monitor",
+          "type": "string",
+          "label": {
+            "en": "Monitor name",
+            "fr": "Nom de la sonde",
+            "de": "Name des Monitors",
+            "es": "Nombre del monitor"
+          }
+        },
+        {
+          "key": "type",
+          "type": "string",
+          "label": {
+            "en": "Monitor type",
+            "fr": "Type de sonde",
+            "de": "Monitortyp",
+            "es": "Tipo de monitor"
+          }
+        },
+        {
+          "key": "url",
+          "type": "string",
+          "label": {
+            "en": "URL or host",
+            "fr": "URL ou hôte",
+            "de": "URL oder Host",
+            "es": "URL o host"
+          }
+        },
+        {
+          "key": "downtime_minutes",
+          "type": "number",
+          "label": {
+            "en": "Outage length (minutes)",
+            "fr": "Durée de la panne (minutes)",
+            "de": "Dauer des Ausfalls (Minuten)",
+            "es": "Duración de la caída (minutos)"
+          }
+        },
+        {
+          "key": "response_time",
+          "type": "number",
+          "label": {
+            "en": "Response time (ms)",
+            "fr": "Temps de réponse (ms)",
+            "de": "Antwortzeit (ms)",
+            "es": "Tiempo de respuesta (ms)"
+          }
+        },
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Uptime Kuma name",
+            "fr": "Nom de l'Uptime Kuma",
+            "de": "Name des Uptime Kuma",
+            "es": "Nombre del Uptime Kuma"
+          }
+        }
+      ]
+    },
+    {
+      "key": "certificate_expiring",
+      "label": {
+        "en": "Certificate expires soon",
+        "fr": "Certificat bientôt expiré",
+        "de": "Zertifikat läuft bald ab",
+        "es": "El certificado caduca pronto"
+      },
+      "description": {
+        "en": "The HTTPS certificate of a monitor reaches the number of days left set in the configuration.",
+        "fr": "Le certificat HTTPS d'une sonde atteint le nombre de jours restants choisi dans la configuration.",
+        "de": "Das HTTPS-Zertifikat eines Monitors erreicht die in der Konfiguration gewählte Zahl verbleibender Tage.",
+        "es": "El certificado HTTPS de un monitor alcanza el número de días restantes elegido en la configuración."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "multi_select",
+          "source": "devices",
+          "label": {
+            "en": "Monitors (empty: any)",
+            "fr": "Sondes (vide : n'importe laquelle)",
+            "de": "Monitore (leer: beliebig)",
+            "es": "Monitores (vacío: cualquiera)"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "monitor",
+          "type": "string",
+          "label": {
+            "en": "Monitor name",
+            "fr": "Nom de la sonde",
+            "de": "Name des Monitors",
+            "es": "Nombre del monitor"
+          }
+        },
+        {
+          "key": "type",
+          "type": "string",
+          "label": {
+            "en": "Monitor type",
+            "fr": "Type de sonde",
+            "de": "Monitortyp",
+            "es": "Tipo de monitor"
+          }
+        },
+        {
+          "key": "url",
+          "type": "string",
+          "label": {
+            "en": "URL or host",
+            "fr": "URL ou hôte",
+            "de": "URL oder Host",
+            "es": "URL o host"
+          }
+        },
+        {
+          "key": "days_remaining",
+          "type": "number",
+          "label": {
+            "en": "Days left",
+            "fr": "Jours restants",
+            "de": "Verbleibende Tage",
+            "es": "Días restantes"
+          }
+        },
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Uptime Kuma name",
+            "fr": "Nom de l'Uptime Kuma",
+            "de": "Name des Uptime Kuma",
+            "es": "Nombre del Uptime Kuma"
+          }
+        }
+      ]
+    },
+    {
+      "key": "instance_unreachable",
+      "label": {
+        "en": "Uptime Kuma no longer answers",
+        "fr": "Uptime Kuma ne répond plus",
+        "de": "Uptime Kuma antwortet nicht mehr",
+        "es": "Uptime Kuma ya no responde"
+      },
+      "description": {
+        "en": "Uptime Kuma itself stopped answering (two reads in a row): nothing is watched any more.",
+        "fr": "Uptime Kuma lui-même ne répond plus (deux lectures de suite) : plus rien n'est surveillé.",
+        "de": "Uptime Kuma selbst antwortet nicht mehr (zwei Abfragen in Folge): Nichts wird mehr überwacht.",
+        "es": "El propio Uptime Kuma ha dejado de responder (dos lecturas seguidas): ya no se vigila nada."
+      },
+      "variables": [
+        {
+          "key": "instance",
+          "type": "string",
+          "label": {
+            "en": "Uptime Kuma name",
+            "fr": "Nom de l'Uptime Kuma",
+            "de": "Name des Uptime Kuma",
+            "es": "Nombre del Uptime Kuma"
+          }
+        },
+        {
+          "key": "error",
+          "type": "string",
+          "label": {
+            "en": "Error",
+            "fr": "Erreur",
+            "de": "Fehler",
+            "es": "Error"
+          }
         }
       ]
     }
   ],
   "scene_actions": [
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "get_monitor_status",
+      "label": {
+        "en": "State of a service",
+        "fr": "État d'un service",
+        "de": "Status eines Dienstes",
+        "es": "Estado de un servicio"
       },
-      "timeout_seconds": 15,
+      "description": {
+        "en": "Reads the state of a monitor for the next actions: up or not, in words, response time.",
+        "fr": "Lit l'état d'une sonde pour les actions suivantes : en service ou non, en toutes lettres, temps de réponse.",
+        "de": "Liest den Status eines Monitors für die nächsten Aktionen: in Betrieb oder nicht, in Worten, Antwortzeit.",
+        "es": "Lee el estado de un monitor para las acciones siguientes: en servicio o no, en palabras, tiempo de respuesta."
+      },
+      "timeout_seconds": 20,
       "fields": [
         {
           "key": "device",
           "type": "select",
           "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
+          "label": {
+            "en": "Monitor",
+            "fr": "Sonde",
+            "de": "Monitor",
+            "es": "Monitor"
+          },
           "required": true
         }
       ],
       "outputs": [
         {
-          "key": "signalled",
+          "key": "up",
           "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "label": {
+            "en": "Up",
+            "fr": "En service",
+            "de": "In Betrieb",
+            "es": "En servicio"
+          }
+        },
+        {
+          "key": "status",
+          "type": "string",
+          "label": {
+            "en": "State",
+            "fr": "État",
+            "de": "Status",
+            "es": "Estado"
+          }
+        },
+        {
+          "key": "name",
+          "type": "string",
+          "label": {
+            "en": "Monitor name",
+            "fr": "Nom de la sonde",
+            "de": "Name des Monitors",
+            "es": "Nombre del monitor"
+          }
+        },
+        {
+          "key": "response_time",
+          "type": "number",
+          "label": {
+            "en": "Response time (ms)",
+            "fr": "Temps de réponse (ms)",
+            "de": "Antwortzeit (ms)",
+            "es": "Tiempo de respuesta (ms)"
+          }
+        },
+        {
+          "key": "certificate_days",
+          "type": "number",
+          "label": {
+            "en": "Days until certificate expiry",
+            "fr": "Jours avant expiration du certificat",
+            "de": "Tage bis zum Zertifikatsablauf",
+            "es": "Días hasta que caduque el certificado"
+          }
+        }
+      ]
+    },
+    {
+      "key": "count_down_services",
+      "label": {
+        "en": "Count the services down",
+        "fr": "Compter les services en panne",
+        "de": "Ausgefallene Dienste zählen",
+        "es": "Contar los servicios caídos"
+      },
+      "description": {
+        "en": "Counts the monitors down, up and in total (groups left out) and lists the ones down, for a message.",
+        "fr": "Compte les sondes hors service, en service et au total (groupes exclus) et nomme celles en panne, pour un message.",
+        "de": "Zählt die ausgefallenen, laufenden und alle Monitore (ohne Gruppen) und nennt die ausgefallenen, für eine Nachricht.",
+        "es": "Cuenta los monitores caídos, en servicio y en total (sin grupos) y nombra los caídos, para un mensaje."
+      },
+      "timeout_seconds": 20,
+      "outputs": [
+        {
+          "key": "down",
+          "type": "number",
+          "label": {
+            "en": "Services down",
+            "fr": "Services en panne",
+            "de": "Ausgefallene Dienste",
+            "es": "Servicios caídos"
+          }
+        },
+        {
+          "key": "names",
+          "type": "string",
+          "label": {
+            "en": "Names of the services down",
+            "fr": "Noms des services en panne",
+            "de": "Namen der ausgefallenen Dienste",
+            "es": "Nombres de los servicios caídos"
+          }
+        },
+        {
+          "key": "up",
+          "type": "number",
+          "label": {
+            "en": "Services up",
+            "fr": "Services en service",
+            "de": "Dienste in Betrieb",
+            "es": "Servicios en servicio"
+          }
+        },
+        {
+          "key": "total",
+          "type": "number",
+          "label": {
+            "en": "Monitors in total",
+            "fr": "Sondes au total",
+            "de": "Monitore insgesamt",
+            "es": "Monitores en total"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
+      "key": "uptime_kuma",
+      "label": {
+        "en": "Uptime Kuma",
+        "fr": "Uptime Kuma",
+        "de": "Uptime Kuma",
+        "es": "Uptime Kuma"
+      },
       "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+        "en": "Services down and up, the next certificate to expire, and the state of each monitor.",
+        "fr": "Services en panne et en service, prochain certificat à expirer, état de chaque sonde.",
+        "de": "Ausgefallene und laufende Dienste, das nächste ablaufende Zertifikat, Status jedes Monitors.",
+        "es": "Servicios caídos y en servicio, próximo certificado en caducar, estado de cada monitor."
       },
       "icon": "activity",
-      "action_timeout_seconds": 15
+      "action_timeout_seconds": 20,
+      "settings": [
+        {
+          "key": "monitors",
+          "type": "multi_select",
+          "source": "devices",
+          "label": {
+            "en": "Monitors (empty: all)",
+            "fr": "Sondes (vide : toutes)",
+            "de": "Monitore (leer: alle)",
+            "es": "Monitores (vacío: todos)"
+          },
+          "description": {
+            "en": "Empty: every monitor except groups, problems first. Only the devices added to Gladys can be chosen.",
+            "fr": "Vide : toutes les sondes sauf les groupes, les problèmes d'abord. Seuls les appareils ajoutés à Gladys se choisissent.",
+            "de": "Leer: alle Monitore außer Gruppen, Probleme zuerst. Nur die in Gladys angelegten Geräte sind wählbar.",
+            "es": "Vacío: todos los monitores salvo los grupos, los problemas primero. Solo se pueden elegir los dispositivos añadidos a Gladys."
+          },
+          "required": false
+        }
+      ]
     }
   ]
 }

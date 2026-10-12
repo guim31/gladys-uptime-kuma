@@ -1,0 +1,214 @@
+# HELP monitor_cert_days_remaining The number of days remaining until the certificate expires
+# TYPE monitor_cert_days_remaining gauge
+monitor_cert_days_remaining{monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null"} 10
+
+# HELP monitor_cert_is_valid Is the certificate still valid? (1 = Yes, 0= No)
+# TYPE monitor_cert_is_valid gauge
+monitor_cert_is_valid{monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null"} 0
+
+# HELP monitor_response_time Monitor Response Time (ms)
+# TYPE monitor_response_time gauge
+monitor_response_time{monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null"} 7
+monitor_response_time{monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null"} 26
+monitor_response_time{monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080"} 1
+monitor_response_time{monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9"} -1
+monitor_response_time{monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null"} 8
+monitor_response_time{monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null"} -1
+
+# HELP monitor_status Monitor Status (1 = UP, 0= DOWN, 2= PENDING, 3= MAINTENANCE)
+# TYPE monitor_status gauge
+monitor_status{monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null"} 1
+monitor_status{monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null"} 1
+monitor_status{monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080"} 1
+monitor_status{monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9"} 0
+monitor_status{monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null"} 1
+monitor_status{monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null"} 2
+
+# HELP process_cpu_user_seconds_total Total user CPU time spent in seconds.
+# TYPE process_cpu_user_seconds_total counter
+process_cpu_user_seconds_total 2.614013
+
+# HELP process_cpu_system_seconds_total Total system CPU time spent in seconds.
+# TYPE process_cpu_system_seconds_total counter
+process_cpu_system_seconds_total 0.493618
+
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 3.107631
+
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1791832062
+
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 148168704
+
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 1041858560
+
+# HELP process_heap_bytes Process heap size in bytes.
+# TYPE process_heap_bytes gauge
+process_heap_bytes 193609728
+
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 23
+
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1048576
+
+# HELP nodejs_eventloop_lag_seconds Lag of event loop in seconds.
+# TYPE nodejs_eventloop_lag_seconds gauge
+nodejs_eventloop_lag_seconds 0
+
+# HELP nodejs_eventloop_lag_min_seconds The minimum recorded event loop delay.
+# TYPE nodejs_eventloop_lag_min_seconds gauge
+nodejs_eventloop_lag_min_seconds 0.009060352
+
+# HELP nodejs_eventloop_lag_max_seconds The maximum recorded event loop delay.
+# TYPE nodejs_eventloop_lag_max_seconds gauge
+nodejs_eventloop_lag_max_seconds 0.085458943
+
+# HELP nodejs_eventloop_lag_mean_seconds The mean of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_mean_seconds gauge
+nodejs_eventloop_lag_mean_seconds 0.01019640921629413
+
+# HELP nodejs_eventloop_lag_stddev_seconds The standard deviation of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_stddev_seconds gauge
+nodejs_eventloop_lag_stddev_seconds 0.0012807744293010603
+
+# HELP nodejs_eventloop_lag_p50_seconds The 50th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p50_seconds gauge
+nodejs_eventloop_lag_p50_seconds 0.010117119
+
+# HELP nodejs_eventloop_lag_p90_seconds The 90th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p90_seconds gauge
+nodejs_eventloop_lag_p90_seconds 0.010280959
+
+# HELP nodejs_eventloop_lag_p99_seconds The 99th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p99_seconds gauge
+nodejs_eventloop_lag_p99_seconds 0.011403263
+
+# HELP nodejs_active_handles Number of active libuv handles grouped by handle type. Every handle type is C++ class name.
+# TYPE nodejs_active_handles gauge
+nodejs_active_handles{type="Socket"} 3
+nodejs_active_handles{type="Server"} 1
+
+# HELP nodejs_active_handles_total Total number of active handles.
+# TYPE nodejs_active_handles_total gauge
+nodejs_active_handles_total 4
+
+# HELP nodejs_active_requests Number of active libuv requests grouped by request type. Every request type is C++ class name.
+# TYPE nodejs_active_requests gauge
+
+# HELP nodejs_active_requests_total Total number of active requests.
+# TYPE nodejs_active_requests_total gauge
+nodejs_active_requests_total 0
+
+# HELP nodejs_heap_size_total_bytes Process heap size from Node.js in bytes.
+# TYPE nodejs_heap_size_total_bytes gauge
+nodejs_heap_size_total_bytes 73871360
+
+# HELP nodejs_heap_size_used_bytes Process heap size used from Node.js in bytes.
+# TYPE nodejs_heap_size_used_bytes gauge
+nodejs_heap_size_used_bytes 69115840
+
+# HELP nodejs_external_memory_bytes Node.js external memory size in bytes.
+# TYPE nodejs_external_memory_bytes gauge
+nodejs_external_memory_bytes 20178356
+
+# HELP nodejs_heap_space_size_total_bytes Process heap space size total from Node.js in bytes.
+# TYPE nodejs_heap_space_size_total_bytes gauge
+nodejs_heap_space_size_total_bytes{space="read_only"} 0
+nodejs_heap_space_size_total_bytes{space="old"} 58609664
+nodejs_heap_space_size_total_bytes{space="code"} 2568192
+nodejs_heap_space_size_total_bytes{space="map"} 3678208
+nodejs_heap_space_size_total_bytes{space="large_object"} 7966720
+nodejs_heap_space_size_total_bytes{space="code_large_object"} 0
+nodejs_heap_space_size_total_bytes{space="new_large_object"} 0
+nodejs_heap_space_size_total_bytes{space="new"} 1048576
+
+# HELP nodejs_heap_space_size_used_bytes Process heap space size used from Node.js in bytes.
+# TYPE nodejs_heap_space_size_used_bytes gauge
+nodejs_heap_space_size_used_bytes{space="read_only"} 0
+nodejs_heap_space_size_used_bytes{space="old"} 55602384
+nodejs_heap_space_size_used_bytes{space="code"} 2365376
+nodejs_heap_space_size_used_bytes{space="map"} 3229416
+nodejs_heap_space_size_used_bytes{space="large_object"} 7772192
+nodejs_heap_space_size_used_bytes{space="code_large_object"} 0
+nodejs_heap_space_size_used_bytes{space="new_large_object"} 0
+nodejs_heap_space_size_used_bytes{space="new"} 157040
+
+# HELP nodejs_heap_space_size_available_bytes Process heap space size available from Node.js in bytes.
+# TYPE nodejs_heap_space_size_available_bytes gauge
+nodejs_heap_space_size_available_bytes{space="read_only"} 0
+nodejs_heap_space_size_available_bytes{space="old"} 1879128
+nodejs_heap_space_size_available_bytes{space="code"} 38976
+nodejs_heap_space_size_available_bytes{space="map"} 382792
+nodejs_heap_space_size_available_bytes{space="large_object"} 0
+nodejs_heap_space_size_available_bytes{space="code_large_object"} 0
+nodejs_heap_space_size_available_bytes{space="new_large_object"} 1030976
+nodejs_heap_space_size_available_bytes{space="new"} 873936
+
+# HELP nodejs_version_info Node.js version info.
+# TYPE nodejs_version_info gauge
+nodejs_version_info{version="v18.20.3",major="18",minor="20",patch="3"} 1
+
+# HELP nodejs_gc_duration_seconds Garbage collection duration by kind, one of major, minor, incremental or weakcb.
+# TYPE nodejs_gc_duration_seconds histogram
+nodejs_gc_duration_seconds_bucket{le="0.001",kind="incremental"} 4
+nodejs_gc_duration_seconds_bucket{le="0.01",kind="incremental"} 4
+nodejs_gc_duration_seconds_bucket{le="0.1",kind="incremental"} 4
+nodejs_gc_duration_seconds_bucket{le="1",kind="incremental"} 4
+nodejs_gc_duration_seconds_bucket{le="2",kind="incremental"} 4
+nodejs_gc_duration_seconds_bucket{le="5",kind="incremental"} 4
+nodejs_gc_duration_seconds_bucket{le="+Inf",kind="incremental"} 4
+nodejs_gc_duration_seconds_sum{kind="incremental"} 0.001383471965789795
+nodejs_gc_duration_seconds_count{kind="incremental"} 4
+nodejs_gc_duration_seconds_bucket{le="0.001",kind="major"} 0
+nodejs_gc_duration_seconds_bucket{le="0.01",kind="major"} 1
+nodejs_gc_duration_seconds_bucket{le="0.1",kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="1",kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="2",kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="5",kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="+Inf",kind="major"} 2
+nodejs_gc_duration_seconds_sum{kind="major"} 0.023136555016040804
+nodejs_gc_duration_seconds_count{kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="0.001",kind="weakcb"} 17
+nodejs_gc_duration_seconds_bucket{le="0.01",kind="weakcb"} 17
+nodejs_gc_duration_seconds_bucket{le="0.1",kind="weakcb"} 17
+nodejs_gc_duration_seconds_bucket{le="1",kind="weakcb"} 17
+nodejs_gc_duration_seconds_bucket{le="2",kind="weakcb"} 17
+nodejs_gc_duration_seconds_bucket{le="5",kind="weakcb"} 17
+nodejs_gc_duration_seconds_bucket{le="+Inf",kind="weakcb"} 17
+nodejs_gc_duration_seconds_sum{kind="weakcb"} 0.004632950961589814
+nodejs_gc_duration_seconds_count{kind="weakcb"} 17
+nodejs_gc_duration_seconds_bucket{le="0.001",kind="minor"} 19
+nodejs_gc_duration_seconds_bucket{le="0.01",kind="minor"} 25
+nodejs_gc_duration_seconds_bucket{le="0.1",kind="minor"} 25
+nodejs_gc_duration_seconds_bucket{le="1",kind="minor"} 25
+nodejs_gc_duration_seconds_bucket{le="2",kind="minor"} 25
+nodejs_gc_duration_seconds_bucket{le="5",kind="minor"} 25
+nodejs_gc_duration_seconds_bucket{le="+Inf",kind="minor"} 25
+nodejs_gc_duration_seconds_sum{kind="minor"} 0.017562426030635833
+nodejs_gc_duration_seconds_count{kind="minor"} 25
+
+# HELP app_version The service version by package.json
+# TYPE app_version gauge
+app_version{version="1.23.17",major="1",minor="23",patch="17"} 1
+
+# HELP http_request_duration_seconds Duration of HTTP requests in seconds
+# TYPE http_request_duration_seconds histogram
+
+# HELP http_request_size_bytes Size of HTTP requests in bytes
+# TYPE http_request_size_bytes histogram
+
+# HELP http_response_size_bytes Size of HTTP response in bytes
+# TYPE http_response_size_bytes histogram
+
+# HELP expressjs_number_of_open_connections Number of open connections to the Express.js server
+# TYPE expressjs_number_of_open_connections gauge
+expressjs_number_of_open_connections 0

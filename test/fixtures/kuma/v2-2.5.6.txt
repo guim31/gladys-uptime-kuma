@@ -1,0 +1,256 @@
+# HELP monitor_cert_days_remaining The number of days remaining until the certificate expires
+# TYPE monitor_cert_days_remaining gauge
+monitor_cert_days_remaining{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null"} 9
+
+# HELP monitor_cert_is_valid Is the certificate still valid? (1 = Yes, 0= No)
+# TYPE monitor_cert_is_valid gauge
+monitor_cert_is_valid{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null"} 0
+
+# HELP monitor_uptime_ratio Uptime ratio calculated over sliding window specified by the 'window' label. (0.0 - 1.0)
+# TYPE monitor_uptime_ratio gauge
+monitor_uptime_ratio{Home="lab",monitor_id="1",monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="1d"} 1
+monitor_uptime_ratio{Home="lab",monitor_id="1",monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="30d"} 1
+monitor_uptime_ratio{Home="lab",monitor_id="1",monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="365d"} 1
+monitor_uptime_ratio{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null",window="1d"} 1
+monitor_uptime_ratio{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null",window="30d"} 1
+monitor_uptime_ratio{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null",window="365d"} 1
+monitor_uptime_ratio{monitor_id="3",monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080",window="1d"} 1
+monitor_uptime_ratio{monitor_id="3",monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080",window="30d"} 1
+monitor_uptime_ratio{monitor_id="3",monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080",window="365d"} 1
+monitor_uptime_ratio{monitor_id="4",monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9",window="1d"} 0
+monitor_uptime_ratio{monitor_id="4",monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9",window="30d"} 0
+monitor_uptime_ratio{monitor_id="4",monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9",window="365d"} 0
+monitor_uptime_ratio{monitor_id="5",monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="1d"} 1
+monitor_uptime_ratio{monitor_id="5",monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="30d"} 1
+monitor_uptime_ratio{monitor_id="5",monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="365d"} 1
+monitor_uptime_ratio{monitor_id="6",monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null",window="1d"} 0
+monitor_uptime_ratio{monitor_id="6",monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null",window="30d"} 0
+monitor_uptime_ratio{monitor_id="6",monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null",window="365d"} 0
+
+# HELP monitor_response_time_seconds Average response time in seconds calculated over sliding window specified by the 'window' label
+# TYPE monitor_response_time_seconds gauge
+monitor_response_time_seconds{Home="lab",monitor_id="1",monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="1d"} 0.015
+monitor_response_time_seconds{Home="lab",monitor_id="1",monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="30d"} 0.015
+monitor_response_time_seconds{Home="lab",monitor_id="1",monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="365d"} 0.015
+monitor_response_time_seconds{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null",window="1d"} 0.02033333333333333
+monitor_response_time_seconds{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null",window="30d"} 0.02033333333333333
+monitor_response_time_seconds{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null",window="365d"} 0.02033333333333333
+monitor_response_time_seconds{monitor_id="3",monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080",window="1d"} 0.0013333333333333333
+monitor_response_time_seconds{monitor_id="3",monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080",window="30d"} 0.0013333333333333333
+monitor_response_time_seconds{monitor_id="3",monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080",window="365d"} 0.0013333333333333333
+monitor_response_time_seconds{monitor_id="4",monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9",window="1d"} 0
+monitor_response_time_seconds{monitor_id="4",monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9",window="30d"} 0
+monitor_response_time_seconds{monitor_id="4",monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9",window="365d"} 0
+monitor_response_time_seconds{monitor_id="5",monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="1d"} 0.005333333333333333
+monitor_response_time_seconds{monitor_id="5",monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="30d"} 0.005333333333333333
+monitor_response_time_seconds{monitor_id="5",monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null",window="365d"} 0.005333333333333333
+monitor_response_time_seconds{monitor_id="6",monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null",window="1d"} 0
+monitor_response_time_seconds{monitor_id="6",monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null",window="30d"} 0
+monitor_response_time_seconds{monitor_id="6",monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null",window="365d"} 0
+
+# HELP monitor_response_time Monitor Response Time (ms)
+# TYPE monitor_response_time gauge
+monitor_response_time{Home="lab",monitor_id="1",monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null"} 5
+monitor_response_time{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null"} 12
+monitor_response_time{monitor_id="3",monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080"} 1
+monitor_response_time{monitor_id="4",monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9"} -1
+monitor_response_time{monitor_id="5",monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null"} 6
+monitor_response_time{monitor_id="6",monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null"} 1
+
+# HELP monitor_status Monitor Status (1 = UP, 0= DOWN, 2= PENDING, 3= MAINTENANCE)
+# TYPE monitor_status gauge
+monitor_status{Home="lab",monitor_id="1",monitor_name="Web server",monitor_type="http",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null"} 1
+monitor_status{monitor_id="2",monitor_name="Self-signed site",monitor_type="http",monitor_url="https://web.home.arpa:8443/",monitor_hostname="null",monitor_port="null"} 1
+monitor_status{monitor_id="3",monitor_name="Kuma TCP",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="8080"} 1
+monitor_status{monitor_id="4",monitor_name="Closed port",monitor_type="port",monitor_url="https://",monitor_hostname="web.home.arpa",monitor_port="9"} 0
+monitor_status{monitor_id="5",monitor_name="Keyword \"ok\"",monitor_type="keyword",monitor_url="http://web.home.arpa:8080/",monitor_hostname="null",monitor_port="null"} 1
+monitor_status{monitor_id="6",monitor_name="Home lab",monitor_type="group",monitor_url="https://",monitor_hostname="null",monitor_port="null"} 2
+
+# HELP process_cpu_user_seconds_total Total user CPU time spent in seconds.
+# TYPE process_cpu_user_seconds_total counter
+process_cpu_user_seconds_total 1.011946
+
+# HELP process_cpu_system_seconds_total Total system CPU time spent in seconds.
+# TYPE process_cpu_system_seconds_total counter
+process_cpu_system_seconds_total 0.115649
+
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 1.127595
+
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1791832269
+
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 171905024
+
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 33672429568
+
+# HELP process_heap_bytes Process heap size in bytes.
+# TYPE process_heap_bytes gauge
+process_heap_bytes 233390080
+
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 23
+
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1048576
+
+# HELP nodejs_eventloop_lag_seconds Lag of event loop in seconds.
+# TYPE nodejs_eventloop_lag_seconds gauge
+nodejs_eventloop_lag_seconds 0
+
+# HELP nodejs_eventloop_lag_min_seconds The minimum recorded event loop delay.
+# TYPE nodejs_eventloop_lag_min_seconds gauge
+nodejs_eventloop_lag_min_seconds 0.009060352
+
+# HELP nodejs_eventloop_lag_max_seconds The maximum recorded event loop delay.
+# TYPE nodejs_eventloop_lag_max_seconds gauge
+nodejs_eventloop_lag_max_seconds 0.032227327
+
+# HELP nodejs_eventloop_lag_mean_seconds The mean of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_mean_seconds gauge
+nodejs_eventloop_lag_mean_seconds 0.010164402416050686
+
+# HELP nodejs_eventloop_lag_stddev_seconds The standard deviation of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_stddev_seconds gauge
+nodejs_eventloop_lag_stddev_seconds 0.000508957584212709
+
+# HELP nodejs_eventloop_lag_p50_seconds The 50th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p50_seconds gauge
+nodejs_eventloop_lag_p50_seconds 0.010117119
+
+# HELP nodejs_eventloop_lag_p90_seconds The 90th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p90_seconds gauge
+nodejs_eventloop_lag_p90_seconds 0.010239999
+
+# HELP nodejs_eventloop_lag_p99_seconds The 99th percentile of the recorded event loop delays.
+# TYPE nodejs_eventloop_lag_p99_seconds gauge
+nodejs_eventloop_lag_p99_seconds 0.011263999
+
+# HELP nodejs_active_handles Number of active libuv handles grouped by handle type. Every handle type is C++ class name.
+# TYPE nodejs_active_handles gauge
+nodejs_active_handles{type="Socket"} 3
+nodejs_active_handles{type="Server"} 1
+
+# HELP nodejs_active_handles_total Total number of active handles.
+# TYPE nodejs_active_handles_total gauge
+nodejs_active_handles_total 4
+
+# HELP nodejs_active_requests Number of active libuv requests grouped by request type. Every request type is C++ class name.
+# TYPE nodejs_active_requests gauge
+
+# HELP nodejs_active_requests_total Total number of active requests.
+# TYPE nodejs_active_requests_total gauge
+nodejs_active_requests_total 0
+
+# HELP nodejs_heap_size_total_bytes Process heap size from Node.js in bytes.
+# TYPE nodejs_heap_size_total_bytes gauge
+nodejs_heap_size_total_bytes 89714688
+
+# HELP nodejs_heap_size_used_bytes Process heap size used from Node.js in bytes.
+# TYPE nodejs_heap_size_used_bytes gauge
+nodejs_heap_size_used_bytes 84975352
+
+# HELP nodejs_external_memory_bytes Node.js external memory size in bytes.
+# TYPE nodejs_external_memory_bytes gauge
+nodejs_external_memory_bytes 40436334
+
+# HELP nodejs_heap_space_size_total_bytes Process heap space size total from Node.js in bytes.
+# TYPE nodejs_heap_space_size_total_bytes gauge
+nodejs_heap_space_size_total_bytes{space="read_only"} 0
+nodejs_heap_space_size_total_bytes{space="new"} 2097152
+nodejs_heap_space_size_total_bytes{space="old"} 68468736
+nodejs_heap_space_size_total_bytes{space="code"} 2097152
+nodejs_heap_space_size_total_bytes{space="shared"} 0
+nodejs_heap_space_size_total_bytes{space="trusted"} 6602752
+nodejs_heap_space_size_total_bytes{space="new_large_object"} 0
+nodejs_heap_space_size_total_bytes{space="large_object"} 10133504
+nodejs_heap_space_size_total_bytes{space="code_large_object"} 315392
+nodejs_heap_space_size_total_bytes{space="shared_large_object"} 0
+nodejs_heap_space_size_total_bytes{space="trusted_large_object"} 0
+
+# HELP nodejs_heap_space_size_used_bytes Process heap space size used from Node.js in bytes.
+# TYPE nodejs_heap_space_size_used_bytes gauge
+nodejs_heap_space_size_used_bytes{space="read_only"} 0
+nodejs_heap_space_size_used_bytes{space="new"} 692408
+nodejs_heap_space_size_used_bytes{space="old"} 66302000
+nodejs_heap_space_size_used_bytes{space="code"} 1905472
+nodejs_heap_space_size_used_bytes{space="shared"} 0
+nodejs_heap_space_size_used_bytes{space="trusted"} 5902400
+nodejs_heap_space_size_used_bytes{space="new_large_object"} 0
+nodejs_heap_space_size_used_bytes{space="large_object"} 9904568
+nodejs_heap_space_size_used_bytes{space="code_large_object"} 279808
+nodejs_heap_space_size_used_bytes{space="shared_large_object"} 0
+nodejs_heap_space_size_used_bytes{space="trusted_large_object"} 0
+
+# HELP nodejs_heap_space_size_available_bytes Process heap space size available from Node.js in bytes.
+# TYPE nodejs_heap_space_size_available_bytes gauge
+nodejs_heap_space_size_available_bytes{space="read_only"} 0
+nodejs_heap_space_size_available_bytes{space="new"} 338504
+nodejs_heap_space_size_available_bytes{space="old"} 837192
+nodejs_heap_space_size_available_bytes{space="code"} 60352
+nodejs_heap_space_size_available_bytes{space="shared"} 0
+nodejs_heap_space_size_available_bytes{space="trusted"} 585400
+nodejs_heap_space_size_available_bytes{space="new_large_object"} 1048576
+nodejs_heap_space_size_available_bytes{space="large_object"} 0
+nodejs_heap_space_size_available_bytes{space="code_large_object"} 0
+nodejs_heap_space_size_available_bytes{space="shared_large_object"} 0
+nodejs_heap_space_size_available_bytes{space="trusted_large_object"} 0
+
+# HELP nodejs_version_info Node.js version info.
+# TYPE nodejs_version_info gauge
+nodejs_version_info{version="v22.22.3",major="22",minor="22",patch="3"} 1
+
+# HELP nodejs_gc_duration_seconds Garbage collection duration by kind, one of major, minor, incremental or weakcb.
+# TYPE nodejs_gc_duration_seconds histogram
+nodejs_gc_duration_seconds_bucket{le="0.001",kind="minor"} 0
+nodejs_gc_duration_seconds_bucket{le="0.01",kind="minor"} 1
+nodejs_gc_duration_seconds_bucket{le="0.1",kind="minor"} 1
+nodejs_gc_duration_seconds_bucket{le="1",kind="minor"} 1
+nodejs_gc_duration_seconds_bucket{le="2",kind="minor"} 1
+nodejs_gc_duration_seconds_bucket{le="5",kind="minor"} 1
+nodejs_gc_duration_seconds_bucket{le="+Inf",kind="minor"} 1
+nodejs_gc_duration_seconds_sum{kind="minor"} 0.004141718983650207
+nodejs_gc_duration_seconds_count{kind="minor"} 1
+nodejs_gc_duration_seconds_bucket{le="0.001",kind="incremental"} 0
+nodejs_gc_duration_seconds_bucket{le="0.01",kind="incremental"} 2
+nodejs_gc_duration_seconds_bucket{le="0.1",kind="incremental"} 2
+nodejs_gc_duration_seconds_bucket{le="1",kind="incremental"} 2
+nodejs_gc_duration_seconds_bucket{le="2",kind="incremental"} 2
+nodejs_gc_duration_seconds_bucket{le="5",kind="incremental"} 2
+nodejs_gc_duration_seconds_bucket{le="+Inf",kind="incremental"} 2
+nodejs_gc_duration_seconds_sum{kind="incremental"} 0.003806592941284179
+nodejs_gc_duration_seconds_count{kind="incremental"} 2
+nodejs_gc_duration_seconds_bucket{le="0.001",kind="major"} 0
+nodejs_gc_duration_seconds_bucket{le="0.01",kind="major"} 1
+nodejs_gc_duration_seconds_bucket{le="0.1",kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="1",kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="2",kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="5",kind="major"} 2
+nodejs_gc_duration_seconds_bucket{le="+Inf",kind="major"} 2
+nodejs_gc_duration_seconds_sum{kind="major"} 0.03783677101135254
+nodejs_gc_duration_seconds_count{kind="major"} 2
+
+# HELP app_version The service version by package.json
+# TYPE app_version gauge
+app_version{version="2.5.6",major="2",minor="5",patch="6"} 1
+
+# HELP http_request_duration_seconds Duration of HTTP requests in seconds
+# TYPE http_request_duration_seconds histogram
+
+# HELP http_request_size_bytes Size of HTTP requests in bytes
+# TYPE http_request_size_bytes histogram
+
+# HELP http_response_size_bytes Size of HTTP response in bytes
+# TYPE http_response_size_bytes histogram
+
+# HELP expressjs_number_of_open_connections Number of open connections to the Express.js server
+# TYPE expressjs_number_of_open_connections gauge
+expressjs_number_of_open_connections 0
