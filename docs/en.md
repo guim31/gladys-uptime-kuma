@@ -1,61 +1,183 @@
-# Demo Devices Template
+# Uptime Kuma
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+[Uptime Kuma](https://uptime.kuma.pet/) watches your websites and services
+(HTTP, TCP port, ping, DNS, Docker containers…). This integration brings its
+monitors into Gladys: each one becomes a device showing whether the service is
+up, its response time and, for an HTTPS site, the days left before its
+certificate expires. Scenes can react when **any** service goes down or comes
+back, without one scene per device, and a dashboard widget sums it all up.
 
-## What you get
+Tested against real Uptime Kuma 1.23.17 and 2.5.6 servers (Docker); not yet on
+every setup: feedback welcome on
+[the issues](https://github.com/guim31/gladys-uptime-kuma/issues).
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+## What you need
 
-## Configuration
+- Gladys Assistant 5.1.0 or later.
+- Uptime Kuma 1.23 or 2.x, reachable from the Gladys machine (on the local
+  network, or on the Internet in HTTPS).
+- An API key of Uptime Kuma (or its authentication disabled).
 
-1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+The integration only reads: pausing or resuming a monitor stays in Uptime
+Kuma (it would need your administrator password, which Gladys does not ask
+for).
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+## Getting started
 
-## Actions
+### 1. Create an API key
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+In Uptime Kuma, open **Settings → API Keys**, click **Add API Key**, give it a
+name (for example `Gladys`) and no expiry date, then **Generate**. Copy the key
+(it starts with `uk`): Uptime Kuma shows it only once.
 
-## Scenes
+Once a key exists, Uptime Kuma asks for a key on `/metrics` instead of your
+password: tools that read it with the password (Prometheus…) need a key too.
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+### 2. Configure the integration
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+In Gladys, **Integrations → Uptime Kuma → Configuration**:
+
+- **Uptime Kuma address**: the address you open Uptime Kuma with, port
+  included, for example `http://192.168.1.2:3001` or
+  `https://status.example.com`. A URL copied from the browser
+  (`…/dashboard/3`) works too.
+- **API key**: the key of step 1.
+- **Name (optional)**: shown in messages and in the widget instead of the
+  address.
+- A **second Uptime Kuma** can be added, for example one on a rented server
+  watching your home from the outside.
+- **Refresh interval**: 30 seconds by default (15 seconds to 5 minutes).
+- **Certificate warning**: the days left at which "Certificate expires soon"
+  fires (14 by default).
+- **Accept self-signed certificates**: only for an `https://` address whose
+  certificate your browser does not trust either.
+- **Language of the names**: the language of the feature names and of the
+  scene results (French by default).
+
+Save, then click **Test the connection**: each Uptime Kuma answers with its
+version and its number of monitors.
+
+### 3. Add the monitors
+
+Open the **Discover** tab: every monitor of Uptime Kuma is proposed. Add the
+ones you want to see in Gladys; nothing is added on your behalf. A monitor
+added later in Uptime Kuma appears there at the next read.
+
+## The device of each monitor
+
+| Feature                       | Value                                                         |
+| ----------------------------- | ------------------------------------------------------------- |
+| Up                            | On when the service is up, Off when it is down                |
+| Response time                 | The last check, in milliseconds (not on group monitors)       |
+| Days until certificate expiry | For the monitors of an `https://` site; negative once expired |
+
+While Uptime Kuma retries a failed check ("pending") or the monitor is in
+maintenance, the last value stays: only up and down count. While a monitor is
+down, its response time keeps its last value. A paused monitor sends nothing.
+
+A response time changes at every check: it is sent to Gladys at most once a
+minute per monitor, so a hundred monitors stay far below the 300 values per
+minute Gladys accepts.
 
 ## Dashboard
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+Add the **Uptime Kuma** widget to a dashboard. It shows:
+
+- the number of services **down** (red when there is one) and **up**;
+- the **certificate** that expires first, in days (orange from the warning
+  threshold);
+- one row per monitor, the problems first: down, pending, maintenance, paused,
+  then the response time of the services up — ten rows at most, then the
+  count of the others;
+- an instance of Uptime Kuma that does not answer;
+- a **Refresh** button that reads Uptime Kuma again.
+
+By default the widget shows every monitor except the groups (they repeat their
+members). In its settings, **Monitors** narrows it to the devices you choose
+(only devices added to Gladys can be chosen, groups included).
+
+## Scenes
+
+### Triggers
+
+They fire for every monitor, added to Gladys or not. Leave **Monitors** empty
+to react to any of them, or choose some.
+
+- **A service goes down**: a monitor goes from up (or maintenance) to down,
+  once Uptime Kuma spent its retries. Variables: monitor name, monitor type,
+  URL or host, Uptime Kuma name.
+- **A service is back up**: a monitor that was down is up again. Variables:
+  the same, plus the outage length in minutes and the response time.
+- **Certificate expires soon**: the certificate of a monitor reaches the
+  number of days left chosen in the configuration. Once per certificate;
+  again after a renewal. Variables: monitor name, type, URL, days left,
+  Uptime Kuma name.
+- **Uptime Kuma no longer answers**: Uptime Kuma itself stopped answering
+  (two reads in a row), so nothing is watched any more. Variables: Uptime
+  Kuma name, error.
+
+A transition that happens while Gladys or the integration restarts is still
+announced, once. A monitor already down when the integration starts for the
+first time announces nothing.
+
+A group monitor goes down with its members: choose the monitors in the filter
+to avoid two messages for one outage.
+
+### Actions
+
+- **State of a service**: reads a monitor for the next actions of the scene:
+  up (yes/no), the state in words ("Up", "Down", "Pending", "Maintenance",
+  "Paused"), the monitor name, the response time and the days until
+  certificate expiry.
+- **Count the services down**: the number of services down, up and in total
+  (groups left out), and the names of the ones down, for a message.
+
+Both read Uptime Kuma again when the last read is older than 15 seconds.
+
+### Scene ideas
+
+- **Alert on any outage**: trigger "A service goes down" (Monitors empty) →
+  send a message "⚠️ … is down", inserting the variables "Monitor name" and
+  "URL or host". A second scene on "A service is back up" sends "✅ … is back
+  after … min" with "Outage length (minutes)".
+- **Morning report**: every day at 8:00 → "Count the services down" → send a
+  message "… service(s) down: …" with "Services down" and "Names of the
+  services down".
+- **Renew in time**: trigger "Certificate expires soon" → send a message with
+  "Monitor name" and "Days left".
+- **The internet box is down**: trigger "A service goes down" on the monitor
+  of your router → turn on a red light.
 
 ## Troubleshooting
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- **"API key refused"**: check the key (it starts with `uk`) and that it is
+  active in Settings → API Keys. Uptime Kuma also refuses with the same error
+  beyond 60 API requests per minute, shared by every tool that reads its
+  metrics: lengthen the refresh interval if another tool reads it too.
+- **"An API key is needed"**: Uptime Kuma has authentication on and no key is
+  configured.
+- **"Does not answer"**: check the address and the port (3001 by default) from
+  the Gladys machine. `localhost` is the integration container itself: use
+  the IP address of the machine running Uptime Kuma.
+- **"Certificate refused"**: the HTTPS certificate is self-signed or expired;
+  tick "Accept self-signed certificates", or use the `http://` address on the
+  local network.
+- **"No Uptime Kuma at this address"**: the address points at another
+  service, or Uptime Kuma 2 is still waiting for its database setup.
+- **A monitor is missing in the Discover tab**: it is paused in Uptime Kuma.
+- **A device was proposed again after the upgrade to Uptime Kuma 2**: devices
+  added under 1.x keep their identity; a monitor renamed during the upgrade
+  cannot be recognised and is proposed as a new device.
+
+## Limits
+
+- Read only: monitors are paused, resumed and edited in Uptime Kuma.
+- Uptime Kuma is read at the refresh interval: an outage shorter than it may
+  go unseen, and the outage length is known to that precision.
+- Under Uptime Kuma 1.x, monitors have no identifier in the metrics: a
+  monitor renamed in Uptime Kuma 1.x becomes a new device. Under 2.x, renaming
+  is harmless.
+- The tags of Uptime Kuma, the uptime percentages and the status pages are not
+  used.
+- Uptime Kuma answers at most 60 API requests per minute; two instances read
+  every 15 seconds use 8 of them.

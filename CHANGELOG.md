@@ -12,44 +12,28 @@ the notes of the version's GitHub Release.
 
 ### Added
 
-- A working example of scene triggers, scene actions and dashboard widgets
-  (Gladys 5.1.0 or later).
-- `CHANGELOG.md`, rolled by the Release workflow.
-- A GitHub Release for every version, with its changelog section as notes: the
-  Gladys Supervision page links each version to the repository's releases.
-- CI runs the tests on Node 22 and 24, and builds the Docker image.
-- Dependabot keeps the npm dependencies and the GitHub Actions up to date.
-- `SECURITY.md` (how to report a vulnerability) and `CLAUDE.md` (project rules
-  for contributors and coding assistants).
-- Manifest tests: `version` matches `package.json`, `docker_image` is tagged
-  with it, descriptions hold 10 to 100 characters, placeholders are
-  multi-language objects.
-- The latitude and longitude fields show an example value as placeholder.
+- One Gladys device per Uptime Kuma monitor, proposed in the Discover tab:
+  up (on/off), response time in milliseconds and, for an HTTPS site, the days
+  until the certificate expires. Feature names are in French by default
+  (English, German and Spanish available).
+- Uptime Kuma 1.23 and 2.x, read through their `/metrics` endpoint with an API
+  key; up to two instances. A device added under Uptime Kuma 1.x keeps its
+  identity after the upgrade to 2.x.
+- Scene triggers for every monitor, added to Gladys or not: a service goes
+  down, a service is back up (with the length of the outage), certificate
+  expires soon (threshold chosen in the configuration, once per certificate)
+  and Uptime Kuma no longer answers. Transitions that happen while Gladys or
+  the integration restarts are still announced, once.
+- Scene actions: the state of a service (up, the state in words, the response
+  time, the days left on the certificate) and the count of the services down
+  with their names, for a message.
+- An "Uptime Kuma" dashboard widget: services down and up, the next
+  certificate to expire, one row per monitor (problems first), every monitor
+  or the chosen ones, and a Refresh button.
+- A "Test the connection" button, a connection status naming the instance and
+  the problem (key refused, no Uptime Kuma at this address, certificate…), and
+  a transport badge per device.
+- Interface texts and documentation in English, French, German and Spanish.
+- Apache-2.0 `LICENSE` file.
 
-### Changed
-
-- Node.js 22 or later is required (Node 20 is end-of-life).
-- Integration SDK 0.15.0. The tests now run against the fake Gladys of the
-  SDK, which refuses the payloads Gladys refuses.
-- The refresh interval is one minute minimum, the fastest Gladys polls a
-  device. The plug's power is only sent when it changes, and every 30
-  minutes otherwise.
-
-### Fixed
-
-- Gladys refused the devices of the Discovery tab: the weather station and
-  the plug declared their poll frequency in seconds instead of one of the
-  values Gladys accepts, and were never polled. They now poll every minute,
-  and the readings follow the refresh interval of the configuration.
-
-- The release commit no longer fails `npm run format:check`: the Release
-  workflow updates the manifest `version` and `docker_image` in place instead
-  of re-printing the whole file with `jq`.
-- The integration can write to `/data`: the image creates the directory owned
-  by the `node` user, a new Docker volume was owned by root.
-- A sub-container running the integration's own image follows it to the new
-  tag at each release, as well as in the manifest of the build summary: it kept
-  the previous tag, which may not exist on the registry. Sub-containers on a
-  third-party image (a broker, a database...) keep theirs.
-
-[Unreleased]: https://github.com/GladysAssistant/integration-template-js/commits/main
+[Unreleased]: https://github.com/guim31/gladys-uptime-kuma/commits/main

@@ -1,67 +1,202 @@
-# Template de démonstration
+# Uptime Kuma
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+[Uptime Kuma](https://uptime.kuma.pet/) surveille vos sites et services (HTTP,
+port TCP, ping, DNS, conteneurs Docker…). Cette intégration amène ses sondes
+dans Gladys : chacune devient un appareil qui dit si le service est en service,
+son temps de réponse et, pour un site en HTTPS, les jours restants avant
+l'expiration de son certificat. Les scènes peuvent réagir quand **n'importe
+quel** service tombe ou revient, sans une scène par appareil, et un widget du
+tableau de bord résume le tout.
 
-## Ce que vous obtenez
+Testée contre de vrais serveurs Uptime Kuma 1.23.17 et 2.5.6 (Docker) ; pas
+encore sur toutes les installations : vos retours sont bienvenus sur
+[les issues](https://github.com/guim31/gladys-uptime-kuma/issues).
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+## Ce qu'il vous faut
 
-## Configuration
+- Gladys Assistant 5.1.0 ou plus récent.
+- Uptime Kuma 1.23 ou 2.x, joignable depuis la machine de Gladys (sur le
+  réseau local, ou sur Internet en HTTPS).
+- Une clé d'API d'Uptime Kuma (ou son authentification désactivée).
 
-1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+L'intégration ne fait que lire : mettre en pause ou reprendre une sonde se
+fait dans Uptime Kuma (il faudrait votre mot de passe d'administrateur, que
+Gladys ne demande pas).
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+## Mise en route
 
-## Actions
+### 1. Créer une clé d'API
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+Dans Uptime Kuma, ouvrez **Paramètres → Clés API**, cliquez sur **Ajouter une
+clé API**, donnez-lui un nom (par exemple `Gladys`) et aucune date
+d'expiration, puis **Générer**. Copiez la clé (elle commence par `uk`) : Uptime
+Kuma ne l'affiche qu'une fois.
 
-## Scènes
+Dès qu'une clé existe, Uptime Kuma demande une clé sur `/metrics` au lieu de
+votre mot de passe : les outils qui le lisent avec le mot de passe
+(Prometheus…) ont eux aussi besoin d'une clé.
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+### 2. Configurer l'intégration
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+Dans Gladys, **Intégrations → Uptime Kuma → Configuration** :
+
+- **Adresse d'Uptime Kuma** : l'adresse avec laquelle vous ouvrez Uptime Kuma,
+  port compris, par exemple `http://192.168.1.2:3001` ou
+  `https://status.example.com`. Une URL copiée depuis le navigateur
+  (`…/dashboard/3`) convient aussi.
+- **Clé d'API** : la clé de l'étape 1.
+- **Nom (facultatif)** : affiché dans les messages et le widget à la place de
+  l'adresse.
+- Un **second Uptime Kuma** peut être ajouté, par exemple sur un serveur loué
+  qui surveille la maison depuis l'extérieur.
+- **Intervalle de rafraîchissement** : 30 secondes par défaut (de 15 secondes
+  à 5 minutes).
+- **Alerte de certificat** : les jours restants à partir desquels « Certificat
+  bientôt expiré » se déclenche (14 par défaut).
+- **Accepter les certificats auto-signés** : seulement pour une adresse en
+  `https://` dont le certificat n'est pas reconnu par votre navigateur non
+  plus.
+- **Langue des noms** : la langue des noms des fonctionnalités et des
+  résultats de scène (français par défaut).
+
+Enregistrez, puis cliquez sur **Tester la connexion** : chaque Uptime Kuma
+répond avec sa version et son nombre de sondes.
+
+### 3. Ajouter les sondes
+
+Ouvrez l'onglet **Découverte** : toutes les sondes d'Uptime Kuma y sont
+proposées. Ajoutez celles que vous voulez voir dans Gladys ; rien n'est ajouté
+à votre place. Une sonde créée plus tard dans Uptime Kuma y apparaît à la
+lecture suivante.
+
+## L'appareil de chaque sonde
+
+| Fonctionnalité                       | Valeur                                                                |
+| ------------------------------------ | --------------------------------------------------------------------- |
+| En service                           | On quand le service fonctionne, Off quand il est hors service         |
+| Temps de réponse                     | Le dernier test, en millisecondes (pas sur les sondes de type groupe) |
+| Jours avant expiration du certificat | Pour les sondes d'un site en `https://` ; négatif une fois expiré     |
+
+Pendant qu'Uptime Kuma retente un test échoué (« en attente ») ou qu'une sonde
+est en maintenance, la dernière valeur reste : seuls « en service » et « hors
+service » comptent. Tant qu'une sonde est hors service, son temps de réponse
+garde sa dernière valeur. Une sonde en pause n'envoie rien.
+
+Un temps de réponse change à chaque test : il est envoyé à Gladys au plus une
+fois par minute et par sonde, pour qu'une centaine de sondes reste très en
+dessous des 300 valeurs par minute que Gladys accepte.
 
 ## Tableau de bord
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+Ajoutez le widget **Uptime Kuma** à un tableau de bord. Il affiche :
+
+- le nombre de services **hors service** (en rouge s'il y en a un) et **en
+  service** ;
+- le **certificat** qui expire en premier, en jours (orange à partir du seuil
+  d'alerte) ;
+- une ligne par sonde, les problèmes d'abord : hors service, en attente,
+  maintenance, en pause, puis le temps de réponse des services en service —
+  dix lignes au plus, puis le nombre des autres ;
+- un Uptime Kuma qui ne répond pas ;
+- un bouton **Actualiser** qui relit Uptime Kuma.
+
+Par défaut, le widget montre toutes les sondes sauf les groupes (ils répètent
+leurs membres). Dans ses réglages, **Sondes** le restreint aux appareils
+choisis (seuls les appareils ajoutés à Gladys se choisissent, groupes compris).
+
+## Scènes
+
+### Déclencheurs
+
+Ils valent pour toutes les sondes, ajoutées à Gladys ou non. Laissez
+**Sondes** vide pour réagir à n'importe laquelle, ou choisissez-en.
+
+- **Un service tombe** : une sonde passe d'en service (ou de maintenance) à
+  hors service, une fois les nouvelles tentatives d'Uptime Kuma épuisées.
+  Variables : nom de la sonde, type de sonde, URL ou hôte, nom de l'Uptime
+  Kuma.
+- **Un service revient** : une sonde hors service est de nouveau en service.
+  Variables : les mêmes, plus la durée de la panne en minutes et le temps de
+  réponse.
+- **Certificat bientôt expiré** : le certificat d'une sonde atteint le nombre
+  de jours restants choisi dans la configuration. Une fois par certificat ; de
+  nouveau après un renouvellement. Variables : nom de la sonde, type, URL,
+  jours restants, nom de l'Uptime Kuma.
+- **Uptime Kuma ne répond plus** : Uptime Kuma lui-même ne répond plus (deux
+  lectures de suite), donc plus rien n'est surveillé. Variables : nom de
+  l'Uptime Kuma, erreur.
+
+Un changement survenu pendant un redémarrage de Gladys ou de l'intégration
+est tout de même annoncé, une fois. Une sonde déjà hors service au tout premier
+démarrage de l'intégration n'annonce rien.
+
+Une sonde de type groupe tombe avec ses membres : choisissez les sondes dans
+le filtre pour éviter deux messages pour une seule panne.
+
+### Actions
+
+- **État d'un service** : lit une sonde pour les actions suivantes de la
+  scène : en service (oui/non), l'état en toutes lettres (« En service »,
+  « Hors service », « En attente », « Maintenance », « En pause »), le nom de
+  la sonde, le temps de réponse et les jours avant expiration du certificat.
+- **Compter les services en panne** : le nombre de services en panne, en
+  service et au total (groupes exclus), et les noms de ceux en panne, pour un
+  message.
+
+Toutes deux relisent Uptime Kuma quand la dernière lecture date de plus de
+15 secondes.
+
+### Idées de scènes
+
+- **Alerte à chaque panne** : déclencheur « Un service tombe » (Sondes vide) →
+  envoyer un message « ⚠️ … est hors service », en insérant les variables
+  « Nom de la sonde » et « URL ou hôte ». Une seconde scène sur « Un service
+  revient » envoie « ✅ … est revenu après … min » avec « Durée de la panne
+  (minutes) ».
+- **Rapport du matin** : chaque jour à 8 h → « Compter les services en
+  panne » → envoyer un message « … service(s) en panne : … » avec « Services
+  en panne » et « Noms des services en panne ».
+- **Renouveler à temps** : déclencheur « Certificat bientôt expiré » → envoyer
+  un message avec « Nom de la sonde » et « Jours restants ».
+- **La box internet est tombée** : déclencheur « Un service tombe » sur la
+  sonde de votre box → allumer une lampe en rouge.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« Clé d'API refusée »** : vérifiez la clé (elle commence par `uk`) et
+  qu'elle est active dans Paramètres → Clés API. Uptime Kuma refuse aussi avec
+  la même erreur au-delà de 60 requêtes d'API par minute, partagées entre tous
+  les outils qui lisent ses métriques : allongez l'intervalle de
+  rafraîchissement si un autre outil le lit aussi.
+- **« Une clé d'API est nécessaire »** : l'authentification d'Uptime Kuma est
+  active et aucune clé n'est configurée.
+- **« Ne répond pas »** : vérifiez l'adresse et le port (3001 par défaut)
+  depuis la machine de Gladys. `localhost` désigne le conteneur de
+  l'intégration lui-même : utilisez l'adresse IP de la machine qui fait tourner
+  Uptime Kuma.
+- **« Certificat refusé »** : le certificat HTTPS est auto-signé ou expiré ;
+  cochez « Accepter les certificats auto-signés », ou utilisez l'adresse en
+  `http://` sur le réseau local.
+- **« Aucun Uptime Kuma à cette adresse »** : l'adresse mène à un autre
+  service, ou Uptime Kuma 2 attend encore le choix de sa base de données.
+- **Une sonde manque dans l'onglet Découverte** : elle est en pause dans
+  Uptime Kuma.
+- **Un appareil est proposé de nouveau après le passage à Uptime Kuma 2** :
+  les appareils ajoutés sous 1.x gardent leur identité ; une sonde renommée
+  pendant la mise à jour ne peut pas être reconnue et est proposée comme un
+  nouvel appareil.
+
+## Limites
+
+- Lecture seule : les sondes se mettent en pause, se reprennent et se
+  modifient dans Uptime Kuma.
+- Uptime Kuma est lu à l'intervalle de rafraîchissement : une panne plus courte
+  peut passer inaperçue, et la durée d'une panne est connue à cette précision
+  près.
+- Sous Uptime Kuma 1.x, les sondes n'ont pas d'identifiant dans les
+  métriques : une sonde renommée dans Uptime Kuma 1.x devient un nouvel
+  appareil. Sous 2.x, renommer est sans conséquence.
+- Les étiquettes d'Uptime Kuma, les pourcentages de disponibilité et les pages
+  de statut ne sont pas utilisés.
+- Uptime Kuma répond à 60 requêtes d'API par minute au plus ; deux instances
+  lues toutes les 15 secondes en utilisent 8.

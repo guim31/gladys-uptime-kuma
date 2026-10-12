@@ -1,8 +1,8 @@
 {
-  "name": "gladys-integration-template-js",
+  "name": "gladys-uptime-kuma",
   "version": "1.0.0",
   "private": true,
-  "description": "Official starter template to build an external integration for Gladys Assistant with the JavaScript SDK.",
+  "description": "Gladys Assistant integration for Uptime Kuma: monitors as devices, scene triggers when a service goes down or comes back, a dashboard widget.",
   "type": "module",
   "main": "index.js",
   "scripts": {
