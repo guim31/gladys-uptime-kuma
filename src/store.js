@@ -11,6 +11,7 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { createLogger } from '@gladysassistant/integration-sdk';
+import { ProblemLog } from './problems.js';
 
 const logger = createLogger({ name: 'uptime-kuma-store' });
 const FILE_NAME = 'uptime-kuma-state.json';
@@ -21,6 +22,8 @@ export class Store {
     this.path = join(directory, FILE_NAME);
     this.pending = null;
     this.writing = null;
+    // Saved after every read: a /data that cannot be written is reported once.
+    this.problems = new ProblemLog(logger);
   }
 
   async load() {
@@ -49,8 +52,9 @@ export class Store {
           const temporary = `${this.path}.tmp`;
           await writeFile(temporary, JSON.stringify(snapshot));
           await rename(temporary, this.path);
+          this.problems.recover('write', `${this.path} written again`);
         } catch (err) {
-          logger.warn(`Cannot write ${this.path}: ${err.message}`);
+          this.problems.fail('write', `Cannot write ${this.path}: ${err.message}`);
         }
       });
       this.writing = this.pending;

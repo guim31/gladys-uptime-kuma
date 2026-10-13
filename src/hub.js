@@ -18,6 +18,7 @@ import { FEATURE_KEYS, buildDevice, featureValues, monitorIds, parseDeviceId } f
 import { ERROR_KINDS, KumaClient } from './kuma/client.js';
 import { STATUS, nameKey } from './kuma/metrics.js';
 import { hostOf } from './config.js';
+import { ProblemLog } from './problems.js';
 import { ACTION_TEXT, CONNECTION_TEXT, ERROR_TEXT, REPORT_TEXT, labelled, pick } from './texts.js';
 
 const logger = createLogger({ name: 'uptime-kuma-hub' });
@@ -119,6 +120,9 @@ export class KumaHub {
     this.saved = { monitors: {}, certificates: {}, aliases: {} };
     this.pollTimer = null;
     this.stopped = false;
+    // What fails again at every cycle (Gladys refusing, the reading loop):
+    // one line when it starts, one when it ends.
+    this.problems = new ProblemLog(logger);
   }
 
   // --- Lifecycle -------------------------------------------------------------
@@ -216,8 +220,9 @@ export class KumaHub {
     this.pollTimer = setTimeout(async () => {
       try {
         await this.pollAll();
+        this.problems.recover('poll', 'Reading Uptime Kuma works again');
       } catch (err) {
-        logger.error('Poll failed', err);
+        this.problems.fail('poll', `Poll failed: ${err.message}`, 'error');
       }
       this.schedulePoll();
     }, this.config.pollIntervalMs);
@@ -282,8 +287,9 @@ export class KumaHub {
       // Even an empty list: the Discovery tab then shows no stale monitor.
       await this.gladys.publishDiscoveredDevices(devices);
       this.discovered = key;
+      this.problems.recover('discovered', 'Discovered devices accepted again');
     } catch (err) {
-      logger.warn(`Discovered devices refused: ${err.message}`);
+      this.problems.fail('discovered', `Discovered devices refused: ${err.message}`);
     }
   }
 
@@ -447,10 +453,12 @@ export class KumaHub {
     if (!this.timersEnabled || this.stopped) {
       return;
     }
+    const problem = `retry:${record.instance.slot}`;
     record.retryTimer = setTimeout(() => {
       this.poll(record)
         .then((changed) => this.afterChanges(changed))
-        .catch((err) => logger.error('Retry failed', err));
+        .then(() => this.problems.recover(problem))
+        .catch((err) => this.problems.fail(problem, `Retry failed: ${err.message}`, 'error'));
     }, this.timings.retryMs);
     record.retryTimer.unref?.();
   }
@@ -590,8 +598,9 @@ export class KumaHub {
           this.published.set(state.device_feature_external_id, state.state);
           this.publishedAt.set(state.device_feature_external_id, now);
         }
+        this.problems.recover('states', 'States accepted again');
       } catch (err) {
-        logger.warn(`States refused: ${err.message}`);
+        this.problems.fail('states', `States refused: ${err.message}`);
       }
     }
   }
@@ -631,8 +640,9 @@ export class KumaHub {
         for (const entry of batch) {
           this.transports.set(entry.external_id, entry.transport);
         }
+        this.problems.recover('transports', 'Transports accepted again');
       } catch (err) {
-        logger.warn(`Transports refused: ${err.message}`);
+        this.problems.fail('transports', `Transports refused: ${err.message}`);
       }
     }
   }
@@ -677,8 +687,9 @@ export class KumaHub {
     try {
       await this.gladys.setConnectionStatus(status.connected, status.message);
       this.connection = key;
+      this.problems.recover('connection', 'Connection status accepted again');
     } catch (err) {
-      logger.warn(`Connection status refused: ${err.message}`);
+      this.problems.fail('connection', `Connection status refused: ${err.message}`);
     }
   }
 

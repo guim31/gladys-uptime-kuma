@@ -10,6 +10,14 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Changed
+
+- Quieter logs: when Gladys refuses the monitors' states, their badges, the
+  connection status or the device list, or when the data folder cannot be
+  written, the integration logs one line when the problem starts and one when
+  it is over, instead of one line at every refresh. The same goes for an
+  unexpected error of the refresh loop.
+
 ## [1.0.0] - 2026-10-12
 
 ### Added
