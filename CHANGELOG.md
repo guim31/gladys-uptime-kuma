@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-10-13
+
 ### Changed
 
 - Quieter logs: when Gladys refuses the monitors' states, their badges, the
@@ -46,5 +48,6 @@ the notes of the version's GitHub Release.
 - Interface texts and documentation in English, French, German and Spanish.
 - Apache-2.0 `LICENSE` file.
 
-[Unreleased]: https://github.com/guim31/gladys-uptime-kuma/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/guim31/gladys-uptime-kuma/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/guim31/gladys-uptime-kuma/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/guim31/gladys-uptime-kuma/releases/tag/v1.0.0
