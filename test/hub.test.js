@@ -493,3 +493,106 @@ test('a slot left empty forgets its states; another Uptime Kuma there starts afr
   await w.fake.configUpdated({ instance_1_url: URL_1, instance_1_api_key: API_KEY });
   assert.equal(events(w, TRIGGERS.UP).length, 0);
 });
+
+// --- Logs ----------------------------------------------------------------------------
+
+/** Everything written to stdout and stderr while `fn` runs, at `level`. */
+async function captureLogs(t, level, fn) {
+  const lines = [];
+  const write = (chunk) => {
+    lines.push(...String(chunk).split('\n').filter(Boolean));
+    return true;
+  };
+  const before = process.env.LOG_LEVEL;
+  process.env.LOG_LEVEL = level;
+  const stdout = t.mock.method(process.stdout, 'write', write);
+  const stderr = t.mock.method(process.stderr, 'write', write);
+  try {
+    await fn();
+  } finally {
+    stdout.mock.restore();
+    stderr.mock.restore();
+    process.env.LOG_LEVEL = before;
+  }
+  return lines;
+}
+
+test('a normal reading cycle writes nothing at the info level', async (t) => {
+  const w = await world(t);
+  await createDevices(w);
+  const sent = w.fake.states.length;
+  const lines = await captureLogs(t, 'info', async () => {
+    for (let cycle = 0; cycle < 6; cycle += 1) {
+      w.kuma.set(1, { ping: 90 + cycle });
+      w.kuma.set(3, { status: cycle % 2 === 0 ? 2 : 1 }); // pending, then up again
+      await step(w, 60_000);
+    }
+  });
+  assert.ok(w.fake.states.length > sent, 'states were published');
+  assert.deepEqual(lines, []);
+});
+
+test('Gladys refusing the states at every cycle: one line, and one when it accepts them again', async (t) => {
+  const w = await world(t);
+  await createDevices(w);
+  const refuse = t.mock.method(w.gladys, 'publishStates', async () => {
+    throw new Error('HTTP 500');
+  });
+  const failing = await captureLogs(t, 'info', async () => {
+    for (let cycle = 0; cycle < 5; cycle += 1) {
+      w.kuma.set(1, { ping: 100 + cycle });
+      await step(w, 60_000);
+    }
+  });
+  assert.equal(refuse.mock.callCount(), 5);
+  assert.equal(failing.length, 1);
+  assert.match(failing[0], /WARN.*States refused: HTTP 500/i);
+
+  refuse.mock.restore();
+  const back = await captureLogs(t, 'info', async () => {
+    w.kuma.set(1, { ping: 120 });
+    await step(w, 60_000);
+    w.kuma.set(1, { ping: 121 });
+    await step(w, 60_000);
+  });
+  assert.equal(back.length, 1);
+  assert.match(back[0], /States accepted again/);
+  assert.equal(w.fake.lastState(featureId(w.gladys, 1, 'response_time')), 121);
+});
+
+test('an Uptime Kuma that stays unreachable: one line, and one when it answers again', async (t) => {
+  const w = await world(t);
+  const lines = await captureLogs(t, 'info', async () => {
+    w.kuma.failure = 'down';
+    for (let cycle = 0; cycle < 5; cycle += 1) {
+      await step(w);
+    }
+    w.kuma.failure = null;
+    await step(w);
+    await step(w);
+  });
+  assert.equal(lines.length, 2, lines.join('\n'));
+  assert.match(lines[0], /WARN.*Uptime Kuma 1 \(Home\)/);
+  assert.match(lines[1], /Uptime Kuma 1 \(Home\) answers again/);
+  assert.ok(!lines.join('\n').includes(API_KEY));
+});
+
+test('the internal timer reads Uptime Kuma and publishes the changes, without any poll from Gladys', async (t) => {
+  // No onPoll here: Gladys does not poll devices created without should_poll
+  // (GladysAssistant/Gladys#3198), the hub must read on its own.
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const w = await world(t, { timers: true });
+  await createDevices(w);
+  assert.equal(w.fake.discoveredDevices[0].should_poll, false);
+  const up = featureId(w.gladys, 2, 'up');
+  assert.equal(w.fake.lastState(up), 1);
+
+  w.kuma.set(2, { status: 0, ping: null });
+  w.clock.advance(30_000);
+  t.mock.timers.tick(30_000); // poll_interval: 30 s by default
+  for (let i = 0; i < 20 && w.fake.lastState(up) !== 0; i += 1) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  assert.equal(w.fake.lastState(up), 0);
+  assert.equal(events(w, TRIGGERS.DOWN).length, 1);
+});

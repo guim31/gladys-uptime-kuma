@@ -38,6 +38,7 @@ export function createClock(start = Date.UTC(2026, 9, 12, 10, 0, 0)) {
  * @param {object} [options.config] raw integration config
  * @param {Array} [options.devices] devices already created in Gladys
  * @param {boolean} [options.connect]
+ * @param {boolean} [options.timers] the hub's own reading timer (mock them first)
  */
 export async function createWorld({
   clock = createClock(),
@@ -52,13 +53,14 @@ export async function createWorld({
   connect = true,
   dataDir = mkdtempSync(join(tmpdir(), 'gladys-uptime-kuma-')),
   timings = {},
+  timers = false,
 } = {}) {
   const network = createNetwork(instances ?? { [URL_1]: new FakeKuma() });
   const gladys = createFakeGladys({ config, devices });
   const app = registerHandlers(gladys, {
     store: new Store(dataDir),
     request: network.request,
-    timers: false,
+    timers,
     timings,
     now: clock.now,
   });
