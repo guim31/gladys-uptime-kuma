@@ -8,8 +8,8 @@
     "de": "Sieh deine selbst gehosteten Dienste in Gladys und reagiere, wenn einer ausfällt.",
     "es": "Vea sus servicios autoalojados en Gladys y reaccione cuando uno se caiga."
   },
-  "version": "1.0.1",
-  "docker_image": "ghcr.io/guim31/gladys-uptime-kuma:1.0.1",
+  "version": "1.0.2",
+  "docker_image": "ghcr.io/guim31/gladys-uptime-kuma:1.0.2",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/guim31/gladys-uptime-kuma/main/cover.png",
   "categories": ["network"],

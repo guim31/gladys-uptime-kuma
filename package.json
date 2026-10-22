@@ -1,6 +1,6 @@
 {
   "name": "gladys-uptime-kuma",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "Gladys Assistant integration for Uptime Kuma: monitors as devices, scene triggers when a service goes down or comes back, a dashboard widget.",
   "type": "module",
